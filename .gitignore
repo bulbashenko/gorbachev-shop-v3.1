@@ -1,0 +1,28 @@
+# Frontend
+frontend/node_modules
+frontend/.next
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+
+# Backend
+backend/venv
+**/__pycache__/
+**/*.pyc 
+backend/.env
+backend/.env.local
+backend/logs/
+backend/debug.log
+**/tests/
+**/tests.py 
+
+backend/.pytest_cache/
+backend/.coverage
+backend/pytest.ini
+
+# Project files
+structure.txt
+tree.py
+
+
+.vscode

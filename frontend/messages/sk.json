@@ -1,0 +1,114 @@
+{
+  "NotFoundPage": {
+    "title": "404 - Nenájdené"
+  },
+  "Header": {
+    "allProducts": "Všetky produkty",
+    "accessories": "Doplnky",
+    "sweaters": "Svetre",
+    "tshirts": "Tričká",
+    "pants": "Nohavice",
+    "bags": "Tašky",
+    "sm-sweaters": "svetre",
+    "sm-tshirts": "tričká",
+    "sm-pants": "nohavice",
+    "sm-bags": "tašky",
+    "sm-allProducts": "všetko",
+    "sm-accessories": "doplnky",
+    "information": "Informácie",
+    "Account": "Účet",
+    "Theme": "Téma",
+    "logout": "Odhlásiť sa"
+  },
+  "Metadata": {
+    "title": "GORBACHEV SHOP",
+    "description": "Obchod snov"
+  },
+  "HomePage": {
+    "title": "Ahoj, svet!",
+    "about": "Prejdite na stránku O nás"
+  },
+  "About": {
+    "title": "Toto je stránka O nás!"
+  },
+  "Auth": {
+    "common": {
+      "email": "Email",
+      "password": "Heslo",
+      "loading": "Načítavam...",
+      "error": {
+        "invalidCredentials": "Neplatný email alebo heslo",
+        "emailExists": "Email je už registrovaný",
+        "serverError": "Vyskytla sa chyba servera",
+        "networkError": "Chyba siete",
+        "unknownError": "Vyskytla sa neznáma chyba"
+      }
+    },
+    "login": {
+      "title": "Vitajte späť",
+      "subtitle": "Prihláste sa do svojho účtu",
+      "submit": "Prihlásiť sa",
+      "switchToRegister": "Nemáte účet? Zaregistrujte sa",
+      "forgotPassword": "Zabudli ste heslo?",
+      "rememberMe": "Zapamätať si ma"
+    },
+    "register": {
+      "title": "Vytvoriť účet",
+      "subtitle": "Vyplňte údaje pre vytvorenie účtu",
+      "username": "Používateľské meno",
+      "submit": "Vytvoriť účet",
+      "switchToLogin": "Už máte účet? Prihláste sa",
+      "termsText": "Registráciou súhlasíte s našimi",
+      "termsLink": "Podmienkami používania",
+      "privacyLink": "Zásadami ochrany osobných údajov"
+    },
+    "validation": {
+      "emailRequired": "Email je povinný",
+      "emailInvalid": "Prosím, zadajte platný email",
+      "passwordRequired": "Heslo je povinné",
+      "passwordMinLength": "Heslo musí mať aspoň 8 znakov",
+      "usernameRequired": "Používateľské meno je povinné",
+      "usernameMinLength": "Používateľské meno musí mať aspoň 3 znaky"
+    }
+  },
+  "Account": {
+    "tabs": {
+      "profile": "Profil",
+      "orders": "Objednávky",
+      "favorites": "Obľúbené"
+    },
+    "profile": {
+      "title": "Informácie o profile",
+      "email": "Email",
+      "username": "Používateľské meno",
+      "joinDate": "Dátum registrácie",
+      "changePassword": "Zmeniť heslo",
+      "logout": "Odhlásiť sa",
+      "deleteAccount": "Odstrániť účet"
+    },
+    "orders": {
+      "title": "Moje objednávky",
+      "noOrders": "Zatiaľ nemáte žiadne objednávky"
+    },
+    "favorites": {
+      "title": "Obľúbené",
+      "noItems": "Zatiaľ ste nepridali žiadne položky do obľúbených"
+    }
+  },
+  "Admin": {
+    "welcome": "Vitajte, {name}",
+    "stats": {
+      "users": "Celkový počet používateľov",
+      "products": "Celkový počet produktov",
+      "orders": "Celkový počet objednávok"
+    },
+    "quickActions": "Rýchle akcie",
+    "actions": {
+      "addProduct": "Pridať produkt",
+      "viewOrders": "Zobraziť objednávky",
+      "manageUsers": "Spravovať používateľov"
+    },
+    "recentActivity": "Nedávna aktivita",
+    "noRecentActivity": "Žiadna nedávna aktivita na zobrazenie"
+  }
+}

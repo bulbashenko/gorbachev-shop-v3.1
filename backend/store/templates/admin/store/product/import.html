@@ -1,0 +1,288 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static admin_urls %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    .import-container {
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+    }
+
+    .import-card {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+
+    .import-card h2 {
+        margin: 0 0 20px 0;
+        color: #1e293b;
+        font-size: 18px;
+    }
+
+    .import-form {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .form-group label {
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .file-input-wrapper {
+        position: relative;
+        overflow: hidden;
+        display: inline-block;
+    }
+
+    .file-input-wrapper input[type=file] {
+        font-size: 100px;
+        position: absolute;
+        left: 0;
+        top: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .file-input-button {
+        display: inline-block;
+        padding: 10px 20px;
+        background: #2563eb;
+        color: white;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .file-name {
+        margin-left: 10px;
+        color: #64748b;
+    }
+
+    .submit-button {
+        padding: 12px 24px;
+        background: #16a34a;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        align-self: flex-start;
+    }
+
+    .submit-button:hover {
+        background: #15803d;
+    }
+
+    .instructions {
+        background: #f8fafc;
+        padding: 20px;
+        border-radius: 8px;
+        margin-top: 20px;
+    }
+
+    .instructions h3 {
+        margin: 0 0 15px 0;
+        color: #1e293b;
+        font-size: 16px;
+    }
+
+    .instructions ul {
+        margin: 0;
+        padding-left: 20px;
+        color: #475569;
+    }
+
+    .instructions li {
+        margin-bottom: 8px;
+    }
+
+    .template-download {
+        display: inline-block;
+        margin-top: 15px;
+        color: #2563eb;
+        text-decoration: none;
+    }
+
+    .template-download:hover {
+        text-decoration: underline;
+    }
+
+    .error-message {
+        background: #fee2e2;
+        color: #991b1b;
+        padding: 12px;
+        border-radius: 4px;
+        margin-bottom: 20px;
+    }
+
+    .success-message {
+        background: #dcfce7;
+        color: #166534;
+        padding: 12px;
+        border-radius: 4px;
+        margin-bottom: 20px;
+    }
+
+    .preview-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    .preview-table th,
+    .preview-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .preview-table th {
+        background: #f8fafc;
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    @media (max-width: 768px) {
+        .import-container {
+            padding: 10px;
+        }
+
+        .submit-button {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="import-container">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="{% if message.tags == 'error' %}error-message{% else %}success-message{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="import-card">
+        <h2>{% trans "Import Products" %}</h2>
+        <form method="post" enctype="multipart/form-data" class="import-form">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="file">{% trans "Choose CSV File" %}</label>
+                <div class="file-input-wrapper">
+                    <button type="button" class="file-input-button">{% trans "Browse" %}</button>
+                    <input type="file" name="file" id="file" accept=".csv" required>
+                    <span class="file-name"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="category">{% trans "Default Category" %}</label>
+                <select name="category" id="category" required>
+                    <option value="">{% trans "Select Category" %}</option>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button type="submit" class="submit-button">{% trans "Import Products" %}</button>
+        </form>
+    </div>
+
+    <div class="instructions">
+        <h3>{% trans "Import Instructions" %}</h3>
+        <ul>
+            <li>{% trans "File must be in CSV format with UTF-8 encoding" %}</li>
+            <li>{% trans "Required columns: name, description, base_price, sku" %}</li>
+            <li>{% trans "Optional columns: meta_title, meta_description, is_active" %}</li>
+            <li>{% trans "Multiple variants can be specified using variant_sku, variant_price, variant_attributes" %}</li>
+            <li>{% trans "Prices should be in decimal format (e.g., 99.99)" %}</li>
+            <li>{% trans "SKUs must be unique" %}</li>
+        </ul>
+        <a href="{% url 'admin:store_product_download_template' %}" class="template-download">
+            {% trans "Download Template" %}
+        </a>
+    </div>
+
+    {% if preview_data %}
+    <div class="import-card">
+        <h2>{% trans "Preview" %}</h2>
+        <table class="preview-table">
+            <thead>
+                <tr>
+                    <th>{% trans "Name" %}</th>
+                    <th>{% trans "SKU" %}</th>
+                    <th>{% trans "Price" %}</th>
+                    <th>{% trans "Category" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in preview_data %}
+                <tr>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.sku }}</td>
+                    <td>{{ item.base_price }}</td>
+                    <td>{{ item.category }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extrajs %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const fileInput = document.querySelector('input[type=file]');
+        const fileNameSpan = document.querySelector('.file-name');
+
+        fileInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                fileNameSpan.textContent = this.files[0].name;
+            } else {
+                fileNameSpan.textContent = '';
+            }
+        });
+
+        // Form validation
+        const form = document.querySelector('.import-form');
+        form.addEventListener('submit', function(e) {
+            const file = fileInput.files[0];
+            if (!file) {
+                e.preventDefault();
+                alert('{% trans "Please select a file" %}');
+                return;
+            }
+
+            if (!file.name.toLowerCase().endsWith('.csv')) {
+                e.preventDefault();
+                alert('{% trans "Please select a CSV file" %}');
+                return;
+            }
+
+            const category = document.getElementById('category').value;
+            if (!category) {
+                e.preventDefault();
+                alert('{% trans "Please select a category" %}');
+                return;
+            }
+        });
+    });
+</script>
+{% endblock %}
