@@ -4,7 +4,7 @@
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { setLocale } from '../store/slices/languageSlice';
-import Cookies from '../../node_modules/@types/js-cookie';
+import Cookies from 'js-cookie';
 
 const LanguageInitializer: React.FC = () => {
   const dispatch = useDispatch();

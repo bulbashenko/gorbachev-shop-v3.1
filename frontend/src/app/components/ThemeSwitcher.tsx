@@ -8,7 +8,7 @@ import { useTranslations } from 'next-intl';
 
 
 const ThemeSwitcher: React.FC = () => {
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { setTheme, resolvedTheme } = useTheme();
   const t = useTranslations();
 
   const toggleTheme = () => {

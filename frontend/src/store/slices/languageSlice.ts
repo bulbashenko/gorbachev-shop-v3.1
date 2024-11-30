@@ -1,6 +1,6 @@
 // src/store/languageSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import Cookies from '../../../node_modules/@types/js-cookie';
+import Cookies from 'js-cookie';
 
 interface LanguageState {
   locale: string;
