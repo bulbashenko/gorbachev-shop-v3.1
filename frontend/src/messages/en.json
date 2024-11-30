@@ -1,0 +1,15 @@
+{
+    "hello": "Hello",
+    "welcome": "Welcome to our store!",
+    "theme": "Dark theme",
+    "logoAlt": "Logo",
+    "nav": {
+      "home": "Home",
+      "about": "About Us",
+      "contact": "Contact"
+    },
+    "buttons": {
+      "login": "Login"
+    }
+}
+  
