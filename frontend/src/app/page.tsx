@@ -1,7 +1,6 @@
 // src/app/page.tsx
 'use client';
 
-import React from 'react';
 import LanguageSwitcher from './components/LanguageSwitcher';
 import { useTranslations } from 'next-intl';
 import ThemeSwitcher from './components/ThemeSwitcher';
