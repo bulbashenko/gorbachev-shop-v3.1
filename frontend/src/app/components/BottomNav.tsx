@@ -44,7 +44,7 @@ const BottomNav: React.FC = () => {
   return (
     <nav
       className="
-        fixed bottom-0 left-0 right-0 flex justify-around items-center py-3
+        fixed bottom-0 left-0 right-0 flex justify-around items-center py-3 bg-background
         shadow-[0_-4px_45px_rgba(0,0,0,0.05)] z-50
         block lg:hidden
       "
