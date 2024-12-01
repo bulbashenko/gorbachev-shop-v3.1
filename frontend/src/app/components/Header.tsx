@@ -47,7 +47,7 @@ export default function Header() {
                 {t(labelKey)}
               </Link>
             ))}
-            <Link href="/information" className="text-base lg:text-sm xl:text-lg">
+            <Link href="/about" className="text-base lg:text-sm xl:text-lg">
               {t('navigation.information')}
             </Link>
           </nav>

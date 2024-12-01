@@ -53,7 +53,7 @@ const BottomNav: React.FC = () => {
         <Link
           href={item.href}
           key={item.key}
-          className="flex flex-col items-center text-center transition-colors duration-200"
+          className="flex flex-col items-center text-center"
           aria-label={item.label}
         >
           {item.icon}
