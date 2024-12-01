@@ -1,0 +1,29 @@
+{
+  "hello": "Hello",
+  "welcome": "Welcome to our store!",
+  "theme": "Dark theme",
+  "logoAlt": "Logo",
+  "nav": {
+    "home": "Home",
+    "about": "About Us",
+    "contact": "Contact"
+  },
+  "buttons": {
+    "login": "Login"
+  },
+  "navigation": {
+    "allProducts": "All Products",
+    "mobAllProducts": "ALL",
+    "sweaters": "Sweaters",
+    "mobSweaters": "SWEATERS",
+    "pants": "Pants",
+    "mobPants": "PANTS",
+    "bags": "Bags",
+    "mobBags": "BAGS",
+    "tshirts": "T-shirts",
+    "mobTshirts": "T-SHIRTS",
+    "accessories": "Accessories",
+    "mobAccessories": "EXTRA",
+    "information": "About"
+  }
+}

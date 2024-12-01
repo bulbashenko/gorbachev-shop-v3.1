@@ -1,0 +1,23 @@
+{
+    "hello": "Привет",
+    "welcome": "Добро пожаловать в наш магазин!",
+    "theme": "Тёмная тема",
+    "logoAlt": "Логотип",
+    "nav": {
+        "home": "Главная",
+        "about": "О нас",
+        "contact": "Контакты"
+    },
+    "buttons": {
+        "login": "Войти"
+    },
+    "navigation": {
+        "allProducts": "Все товары",
+        "sweaters": "Свитеры",
+        "pants": "Штаны",
+        "bags": "Сумки",
+        "tshirts": "Футболки",
+        "accessories": "Аксессуары",
+        "information": "О нас"
+    }
+}
