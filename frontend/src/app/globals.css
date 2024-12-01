@@ -18,11 +18,13 @@
 .light {
   --background: #ffffff;
   --foreground: #000;
+  --secondary: #F2F2F2;
 }
 
 .dark {
   --background: #030303;
   --foreground: #ededed;
+  --secondary: #505050;
 }
 
 body {
