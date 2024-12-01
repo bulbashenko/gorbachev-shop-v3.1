@@ -17,25 +17,25 @@ const menuItems: MenuItemType[] = [
   {
     key: 'catalog',
     label: 'Catalog',
-    icon: <FiBook size={28} />, // Increased size
+    icon: <FiBook size={28} />,
     href: '/catalog',
   },
   {
     key: 'wishlist',
     label: 'Wishlist',
-    icon: <FiHeart size={28} />, // Increased size
+    icon: <FiHeart size={28} />,
     href: '/wishlist',
   },
   {
     key: 'cart',
     label: 'Cart',
-    icon: <FiShoppingCart size={28} />, // Increased size
+    icon: <FiShoppingCart size={28} />,
     href: '/cart',
   },
   {
     key: 'settings',
     label: 'Settings',
-    icon: <FiSettings size={28} />, // Increased size
+    icon: <FiSettings size={28} />,
     href: '/settings',
   },
 ];
@@ -44,7 +44,8 @@ const BottomNav: React.FC = () => {
   return (
     <nav
       className="
-        fixed bottom-0 left-0 right-0 bg-black text-white flex justify-around items-center py-3 border-t border-gray-700
+        fixed bottom-0 left-0 right-0 flex justify-around items-center py-3
+        shadow-[0_-4px_45px_rgba(0,0,0,0.05)] z-50
         block lg:hidden
       "
     >
