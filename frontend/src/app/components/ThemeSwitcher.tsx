@@ -1,7 +1,6 @@
 // src/app/components/ThemeSwitcher.tsx
 'use client';
 
-import React from 'react';
 import { useTheme } from 'next-themes';
 import { SunIcon, MoonIcon } from '@heroicons/react/24/solid'; // Иконки для переключателя
 import { useTranslations } from 'next-intl';
@@ -27,7 +26,6 @@ const ThemeSwitcher: React.FC = () => {
             resolvedTheme === 'dark' ? 'translate-x-6' : 'translate-x-1'
           } inline-block w-4 h-4 transform bg-white rounded-full transition-transform`}
         />
-        <span className="sr-only">Toggle theme</span>
       </button>
       {resolvedTheme === 'dark' ? (
         <MoonIcon className="w-5 h-5 text-gray-200" />

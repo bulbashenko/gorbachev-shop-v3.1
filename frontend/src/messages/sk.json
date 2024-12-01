@@ -1,5 +1,23 @@
 {
     "hello": "Ahoj",
     "welcome": "Vitajte v našom obchode!",
-    "theme": "Tmavá téma"
+    "theme": "Tmavá téma",
+    "logoAlt": "Logo",
+    "nav": {
+        "home": "Domov",
+        "about": "O nás",
+        "contact": "Kontakt"
+    },
+    "buttons": {
+        "login": "Prihlásiť sa"
+    },
+    "navigation": {
+        "allProducts": "Všetky produkty",
+        "sweaters": "Svetre",
+        "pants": "Nohavice",
+        "bags": "Tašky",
+        "tshirts": "Tričká",
+        "accessories": "Doplnky",
+        "information": "O spoločnosti"
+    }
 }

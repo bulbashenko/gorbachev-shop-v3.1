@@ -4,10 +4,15 @@ import "./globals.css";
 
 import { ReactNode } from 'react';
 import { cookies } from 'next/headers';
+
 import Providers from './providers/LanguageProvider';
 import { ThemeProvider } from "./providers/ThemeProvider"
 import FontProvider from "./providers/FontProvider";
+
 import Header from "./components/Header";
+import MobileNavigationMenu from "./components/MobileNavigationMenu";
+import BottomNav from "./components/BottomNav";
+
 
 
 const dm_sans = DM_Sans({
@@ -53,8 +58,10 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         >
             <Providers initialLocale={localeFromCookie} initialMessages={messages}>
               <FontProvider dmSansClassName={dm_sans.className} ptSansClassName={pt_sans.className}>
-                <Header />
-                {children}
+                  <Header />
+                  <MobileNavigationMenu />
+                  {children}
+                  <BottomNav />
               </FontProvider>
             </Providers>
         </ThemeProvider>

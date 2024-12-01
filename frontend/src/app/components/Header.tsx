@@ -1,68 +1,88 @@
-// components/Header.tsx
-"use client"
-import { useState } from 'react'
-import Link from 'next/link'
-import { FaSearch, FaUser, FaHeart, FaShoppingCart, FaCog, FaBars, FaTimes } from 'react-icons/fa'
+// src/components/Header.tsx
 
-const Header: React.FC = () => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+'use client'
+
+import { useTranslations } from 'next-intl';
+import Link from 'next/link';
+import navigationLinks from '../utils/navigationLinks';
+import {
+  FiUser,
+  FiHeart,
+  FiShoppingCart,
+  FiSearch,
+} from 'react-icons/fi';
+import LanguageMenu from './LanguageMenu'; // Импорт компонента LanguageMenu
+
+export default function Header() {
+  const t = useTranslations(); // Использует текущий контекст перевода
+  const totalQuantity = 0;
 
   return (
-    <header className="container mx-auto py-4 flex justify-between items-center text-lg">
-      {/* Левая зона: Логотип */}
-      <div className="flex items-center">
-        <Link href="/" className="text-2xl font-bold tracking-wide">
-          gorbachev
-        </Link>
-      </div>
+    <header className="">
+      <div className="container mx-auto py-4 px-6">
+        {/* Mobile Header */}
+        <div className="flex items-center justify-center lg:hidden">
+          <div className="text-2xl font-bold">
+            <Link href="/" className="cursor-pointer">
+              gorbachev
+            </Link>
+          </div>
+        </div>
 
-      {/* Центральная зона: Навигация и Поиск (скрыто на мобильных устройствах) */}
-      <div className={`flex items-center space-x-8 ${isMobileMenuOpen ? 'block' : 'hidden md:flex'}`}>
-        {/* Навигационное меню */}
-        <nav className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-5">
-          <Link href="/catalog" className="hover:text-gray-300">
-            Catalog
-          </Link>
-          <Link href="/about" className="hover:text-gray-300">
-            About
-          </Link>
-          <Link href="/link1" className="hover:text-gray-300">
-            Link1
-          </Link>
-          <Link href="/link2" className="hover:text-gray-300">
-            Link2
-          </Link>
-        </nav>
+        {/* Desktop Header */}
+        <div className="hidden lg:flex items-center justify-between">
+          <div className="text-2xl font-bold">
+            <Link href="/" className="cursor-pointer">
+              gorbachev
+            </Link>
+          </div>
 
-        {/* Поисковая строка */}
-        <div className="flex items-cente rounded-md px-3 mt-4 md:mt-0">
-          <FaSearch className="text-white mr-2" />
-          <input
-            type="text"
-            placeholder="Search..."
-            className="bg-transparent focus:outline-none text-white placeholder-gray-400 text-base"
-          />
+          <nav className="flex space-x-6">
+            {navigationLinks.map(({ href, labelKey }) => (
+              <Link
+                key={href}
+                href={href}
+                className="text-base lg:text-sm xl:text-lg" // Изменён размер текста
+              >
+                {t(labelKey)}
+              </Link>
+            ))}
+            <Link href="/information" className="text-base lg:text-sm xl:text-lg">
+              {t('navigation.information')}
+            </Link>
+          </nav>
+
+          <div className="flex items-center space-x-4 relative">
+            {/* Search Icon */}
+            <Link href="/search" className="relative">
+              <FiSearch className="w-6 h-6" />
+            </Link>
+
+            {/* Account Link */}
+            <Link href="/auth" className="relative">
+              <FiUser className="w-6 h-6" />
+            </Link>
+
+            {/* Favorites Icon */}
+            <Link href="/favorites" className="relative">
+              <FiHeart className="w-6 h-6" />
+            </Link>
+
+            {/* Cart Icon */}
+            <Link href="/cart" className="relative">
+              <FiShoppingCart className="w-6 h-6" />
+              {totalQuantity > 0 && (
+                <span className="absolute -top-2 -right-2 inline-flex items-center justify-center px-1.5 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">
+                  {totalQuantity}
+                </span>
+              )}
+            </Link>
+
+            {/* Language Menu */}
+            <LanguageMenu /> {/* Добавлен компонент LanguageMenu */}
+          </div>
         </div>
       </div>
-
-      {/* Правая зона: Иконки действий и Мобильное меню */}
-      <div className="flex items-center space-x-5">
-        <FaUser className="hover:text-gray-300 cursor-pointer hidden md:block text-xl" />
-        <FaHeart className="hover:text-gray-300 cursor-pointer hidden md:block text-xl" />
-        <FaShoppingCart className="hover:text-gray-300 cursor-pointer hidden md:block text-xl" />
-        <FaCog className="hover:text-gray-300 cursor-pointer hidden md:block text-xl" />
-
-        {/* Кнопка мобильного меню */}
-        <button
-          className="md:hidden focus:outline-none"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          aria-label="Toggle mobile menu"
-        >
-          {isMobileMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
-        </button>
-      </div>
     </header>
-  )
+  );
 }
-
-export default Header

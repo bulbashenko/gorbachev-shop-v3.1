@@ -1,10 +1,12 @@
 // src/store/index.ts
 import { configureStore } from '@reduxjs/toolkit';
 import languageReducer from '@/store/slices/languageSlice';
+import cartReducer from '@/store/slices/cartSlice'
 
 const store = configureStore({
   reducer: {
     language: languageReducer,
+    cart: cartReducer,
   },
 });
 
