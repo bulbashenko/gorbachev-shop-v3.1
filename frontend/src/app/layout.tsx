@@ -12,6 +12,7 @@ import FontProvider from "./providers/FontProvider";
 import Header from "./components/Header";
 import MobileNavigationMenu from "./components/MobileNavigationMenu";
 import BottomNav from "./components/BottomNav";
+import { AuthProvider } from '../contexts/AuthContext';
 
 
 
@@ -37,33 +38,29 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: { children: ReactNode }) {
   const nextCookies = await cookies();
   const localeFromCookie = nextCookies.get('NEXT_LOCALE')?.value || 'en';
-  
-  // Асинхронный импорт сообщений для начальной локали
+
   let messages;
   try {
     messages = (await import(`../messages/${localeFromCookie}.json`)).default;
   } catch (error) {
     console.error(`Ошибка загрузки сообщений для локали ${localeFromCookie}:`, error);
-    // Если произошла ошибка, загрузим сообщения по умолчанию (например, английские)
     messages = (await import(`../messages/en.json`)).default;
   }
 
   return (
     <html lang={localeFromCookie}>
       <body>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-        >
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <AuthProvider>
             <Providers initialLocale={localeFromCookie} initialMessages={messages}>
               <FontProvider dmSansClassName={dm_sans.className} ptSansClassName={pt_sans.className}>
-                  <Header />
-                  <MobileNavigationMenu />
-                  {children}
-                  <BottomNav />
+                <Header />
+                <MobileNavigationMenu />
+                {children}
+                <BottomNav />
               </FontProvider>
             </Providers>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

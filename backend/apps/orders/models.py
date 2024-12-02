@@ -102,15 +102,36 @@ class Order(models.Model):
         return f"Order {self.order_number}"
 
     def save(self, *args, **kwargs):
-        if not self.order_number:
-            last_order = Order.objects.order_by('-created_at').first()
-            if last_order:
-                last_number = int(last_order.order_number[3:])
-                new_number = last_number + 1
-            else:
-                new_number = 1
-            self.order_number = f'ORD{new_number:06d}'
+        # Сохраняем старый статус
+        if self.pk:
+            old_status = Order.objects.get(pk=self.pk).status
+        else:
+            old_status = None
+        
+        # Сохраняем модель
         super().save(*args, **kwargs)
+        
+        # Если статус изменился, создаем запись в истории и отправляем уведомление
+        if old_status != self.status:
+            # Импортируем здесь во избежание циклических импортов
+            from apps.notifications.services import EmailService
+            
+            # Создаем запись в истории статусов
+            OrderStatus.objects.create(
+                order=self,
+                status=self.status,
+                notes=f"Status changed from {old_status} to {self.status}"
+            )
+            
+            # Отправляем уведомление
+            status_change = {
+                'from': old_status,
+                'to': self.status,
+                'notes': f"Status changed from {old_status} to {self.status}"
+            }
+            
+            EmailService.send_order_notification(self)
+            EmailService.send_order_status_update_email(self, status_change)
 
 class OrderItem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

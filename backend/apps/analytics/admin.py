@@ -28,7 +28,6 @@ class SalesReportAdmin(admin.ModelAdmin):
         ('date', admin.DateFieldListFilter),
     )
     readonly_fields = (
-        'created_at', 'updated_at',
         'get_daily_comparison', 'get_weekly_comparison',
         'get_summary_chart'
     )
@@ -45,8 +44,7 @@ class SalesReportAdmin(admin.ModelAdmin):
         }),
         ('Клиенты', {
             'fields': (
-                'new_customers', 'returning_customers',
-                'cancelled_orders'
+                'new_customers', 'returning_customers'
             )
         }),
         ('Возвраты', {
@@ -75,11 +73,7 @@ class SalesReportAdmin(admin.ModelAdmin):
                 'get_daily_comparison',
                 'get_weekly_comparison'
             )
-        }),
-        ('Метаданные', {
-            'fields': ('created_at', 'updated_at'),
-            'classes': ('collapse',)
-        }),
+        })
     )
 
     def get_trend_indicator(self, obj):
@@ -146,7 +140,6 @@ class SalesReportAdmin(admin.ModelAdmin):
                 )
         
         return format_html('<br>'.join(comparison))
-
     get_daily_comparison.short_description = 'Сравнение с предыдущим периодом'
 
     def get_weekly_comparison(self, obj):
@@ -224,8 +217,7 @@ class SalesReportAdmin(admin.ModelAdmin):
 class ProductPerformanceAdmin(admin.ModelAdmin):
     list_display = (
         'product_link', 'date', 'units_sold',
-        'revenue', 'profit', 'return_rate',
-        'get_conversion_rate'
+        'revenue', 'profit', 'return_rate'
     )
     list_filter = (
         'date',
@@ -234,10 +226,7 @@ class ProductPerformanceAdmin(admin.ModelAdmin):
     )
     search_fields = ('product__name', 'product__sku')
     
-    readonly_fields = (
-        'created_at', 'conversion_rate',
-        'get_product_chart'
-    )
+    readonly_fields = ('get_product_chart',)
     
     fieldsets = (
         ('Основная информация', {
@@ -255,13 +244,6 @@ class ProductPerformanceAdmin(admin.ModelAdmin):
                 'returns', 'return_rate'
             )
         }),
-        ('Конверсия', {
-            'fields': (
-                'views', 'unique_views',
-                'add_to_cart_count', 'purchase_count',
-                'conversion_rate'
-            )
-        }),
         ('Рекомендации', {
             'fields': ('frequently_bought_with',)
         })
@@ -271,18 +253,6 @@ class ProductPerformanceAdmin(admin.ModelAdmin):
         url = reverse('admin:products_product_change', args=[obj.product.id])
         return format_html('<a href="{}">{}</a>', url, obj.product.name)
     product_link.short_description = 'Товар'
-
-    def get_conversion_rate(self, obj):
-        """Calculate conversion rate"""
-        if obj.views > 0:
-            rate = (obj.purchase_count / obj.views) * 100
-            return format_html(
-                '<span style="color: {}">{:.1f}%</span>',
-                'green' if rate > 2 else 'orange' if rate > 1 else 'red',
-                rate
-            )
-        return '0%'
-    get_conversion_rate.short_description = 'Конверсия'
 
     def get_product_chart(self, obj):
         """Renders chart for product performance"""
@@ -308,10 +278,7 @@ class CategoryPerformanceAdmin(admin.ModelAdmin):
         'category'
     )
     
-    readonly_fields = (
-        'created_at',
-        'get_category_chart'
-    )
+    readonly_fields = ('get_category_chart',)
     
     fieldsets = (
         ('Основная информация', {
@@ -378,18 +345,17 @@ class CategoryPerformanceAdmin(admin.ModelAdmin):
 class CustomerSegmentAdmin(admin.ModelAdmin):
     list_display = (
         'user_link', 'get_rfm_score', 'total_spent',
-        'purchase_frequency', 'days_since_last_purchase',
-        'is_churned'
+        'purchase_frequency', 'last_purchase_date'
     )
     list_filter = (
         'recency_score', 'frequency_score',
-        'monetary_score', 'is_churned'
+        'monetary_score'
     )
     search_fields = ('user__email', 'user__first_name', 'user__last_name')
     
     readonly_fields = (
-        'created_at', 'updated_at',
-        'get_customer_chart', 'get_segment_description'
+        'get_customer_chart',
+        'get_segment_description'
     )
     
     fieldsets = (
@@ -408,23 +374,9 @@ class CustomerSegmentAdmin(admin.ModelAdmin):
         ('Метрики', {
             'fields': (
                 'last_purchase_date', 'purchase_frequency',
-                'total_spent', 'average_order_value'
+                'total_spent', 'average_order_value',
+                'total_orders', 'return_rate'
             )
-        }),
-        ('Категории и товары', {
-            'fields': (
-                'products_bought', 'categories_bought'
-            )
-        }),
-        ('Риск оттока', {
-            'fields': (
-                'days_since_last_purchase',
-                'is_churned', 'churn_probability'
-            )
-        }),
-        ('Метаданные', {
-            'fields': ('created_at', 'updated_at'),
-            'classes': ('collapse',)
         })
     )
 

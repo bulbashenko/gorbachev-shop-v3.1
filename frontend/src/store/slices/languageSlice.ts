@@ -1,4 +1,3 @@
-// src/store/languageSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import Cookies from 'js-cookie';
 
@@ -7,7 +6,7 @@ interface LanguageState {
 }
 
 const initialState: LanguageState = {
-  locale: 'en', // Значение по умолчанию
+  locale: 'en',
 };
 
 const languageSlice = createSlice({
@@ -16,7 +15,7 @@ const languageSlice = createSlice({
   reducers: {
     setLocale(state, action: PayloadAction<string>) {
       state.locale = action.payload;
-      Cookies.set('NEXT_LOCALE', action.payload); // Сохраняем в куки
+      Cookies.set('NEXT_LOCALE', action.payload);
     },
   },
 });

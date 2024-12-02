@@ -1,16 +1,13 @@
-// src/store/index.ts
 import { configureStore } from '@reduxjs/toolkit';
-import languageReducer from '@/store/slices/languageSlice';
-import cartReducer from '@/store/slices/cartSlice'
+import cartReducer from './slices/cartSlice';
+import languageReducer from './slices/languageSlice';
 
-const store = configureStore({
-  reducer: {
-    language: languageReducer,
-    cart: cartReducer,
-  },
+export const store = configureStore({
+    reducer: {
+        cart: cartReducer,
+        language: languageReducer,
+    },
 });
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
-
-export default store;

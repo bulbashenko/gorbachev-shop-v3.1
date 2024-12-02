@@ -13,11 +13,20 @@
     },
     "navigation": {
         "allProducts": "Все товары",
+        "mobAllProducts": "ВСЕ",
         "sweaters": "Свитеры",
+        "mobSweaters": "СВИТЕРЫ",
         "pants": "Штаны",
+        "mobPants": "ШТАНЫ",
         "bags": "Сумки",
+        "mobBags": "СУМКИ",
         "tshirts": "Футболки",
+        "mobTshirts": "ФУТБОЛКИ",
         "accessories": "Аксессуары",
+        "mobAccessories": "АКСЕССУАРЫ",
         "information": "О нас"
-    }
+    },
+    "title": "Страница не найдена",
+    "description": "Извините, страница, которую вы ищете, не существует или была перемещена.",
+    "homeButton": "Вернуться на главную"
 }
