@@ -9,6 +9,7 @@ frontend/.env.*.local
 backend/venv
 **/__pycache__/
 **/*.pyc 
+**/migrations/
 backend/.env
 backend/.env.local
 backend/logs/
@@ -23,6 +24,5 @@ backend/pytest.ini
 # Project files
 structure.txt
 tree.py
-
 
 .vscode
