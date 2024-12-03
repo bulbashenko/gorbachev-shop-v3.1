@@ -4,11 +4,6 @@ import uuid
 
 class CartMiddleware(MiddlewareMixin):
     def process_request(self, request):
-        """
-        Добавляет корзину к запросу.
-        Для авторизованных пользователей использует их корзину.
-        Для гостей создает сессионную корзину.
-        """
         if request.user.is_authenticated:
             cart, created = Cart.objects.get_or_create(user=request.user)
             if created:

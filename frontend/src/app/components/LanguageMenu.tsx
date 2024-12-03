@@ -27,7 +27,6 @@ const LanguageMenu: React.FC = () => {
     setIsOpen(false);
   };
 
-  // Закрыть меню при клике вне его области
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -55,7 +54,6 @@ const LanguageMenu: React.FC = () => {
         <span>
           {languages.find((lang) => lang.code === locale)?.label || 'EN'}
         </span>
-        {/* Добавляем стрелочку */}
         <svg
           className={`w-4 h-4 ml-2 transition-transform duration-200 ${
             isOpen ? 'transform rotate-180' : ''
@@ -70,17 +68,17 @@ const LanguageMenu: React.FC = () => {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 rounded shadow-lg z-50">
+        <div className="absolute right-0 mt-2 rounded shadow-lg z-50 bg-background">
           {languages.map((language) => (
-            <button
+            <div
               key={language.code}
               onClick={() => changeLanguage(language.code)}
-              className={`w-full text-left px-4 py-2 hover:bg-secondary ${
+              className={`w-full text-left px-4 py-2 hover:bg-secondary cursor-pointer ${
                 locale === language.code ? 'font-semibold' : ''
               }`}
             >
               {language.label}
-            </button>
+            </div>
           ))}
         </div>
       )}

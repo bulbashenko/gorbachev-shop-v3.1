@@ -1,3 +1,4 @@
+// src/hooks/useCartTransfer.ts
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/store';
@@ -35,5 +36,3 @@ export const useCartTransfer = () => {
         };
     }, [isAuthenticated, dispatch]);
 };
-
-export default useCartTransfer;

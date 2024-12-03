@@ -1,15 +1,16 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { use, useEffect, useState, useCallback } from 'react';
 import ProductImage from '@/components/ProductImage';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/store';
-import { addToCart, fetchCart } from '@/store/slices/cartSlice';
-import { productService, type ProductDetail, type Size, type Color } from '@/app/api/services/product.service';
+import { addToCart } from '@/store/slices/cartSlice';
+import { productService, type ProductDetail, type Size, type Color, type ProductImage as ProductImageType, type ProductList } from '@/app/api/services/product.service';
 import { FiHeart, FiMinus, FiPlus } from 'react-icons/fi';
 import ProductCard from '@/components/ProductCard';
 
 export default function ProductDetailPage({ params }: { params: { id: string } }) {
+    const id = use(params).id;
     const dispatch = useDispatch<AppDispatch>();
     const [product, setProduct] = useState<ProductDetail | null>(null);
     const [selectedSize, setSelectedSize] = useState<Size | null>(null);
@@ -19,18 +20,20 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [addingToCart, setAddingToCart] = useState(false);
+    const [addedToCart, setAddedToCart] = useState(false);
 
     const fetchProductDetails = useCallback(async () => {
         try {
-            const data = await productService.getProduct(params.id);
+            const data = await productService.getProduct(id);
             setProduct(data);
-            setSelectedImage(data.main_image);
+            // Устанавливаем главное изображение, если оно есть
+            setSelectedImage(data.main_image || null);
 
             // Pre-select first available variant if exists
-            if (data.available_sizes.length > 0) {
+            if (data.available_sizes?.length > 0) {
                 setSelectedSize(data.available_sizes[0]);
             }
-            if (data.available_colors.length > 0) {
+            if (data.available_colors?.length > 0) {
                 setSelectedColor(data.available_colors[0]);
             }
         } catch (err) {
@@ -38,7 +41,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
         } finally {
             setLoading(false);
         }
-    }, [params.id]);
+    }, [id]);
 
     useEffect(() => {
         fetchProductDetails();
@@ -46,7 +49,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
 
     const getSelectedVariant = useCallback(() => {
         if (!product || !selectedSize || !selectedColor) return null;
-        return product.variants.find(
+        return product.variants?.find(
             variant =>
                 variant.size.id === selectedSize.id &&
                 variant.color.id === selectedColor.id
@@ -56,7 +59,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
     const handleAddToCart = async () => {
         const variant = getSelectedVariant();
         if (!variant) {
-            alert('Please select size and color');
+            setError('Please select size and color');
             return;
         }
 
@@ -64,12 +67,14 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
         try {
             await dispatch(addToCart({
                 variant_id: variant.id,
-                quantity
+                quantity: quantity
             })).unwrap();
-            dispatch(fetchCart());
-            alert('Product added to cart');
+            
+            setAddedToCart(true);
+            setError(null);
         } catch (err) {
-            alert(err instanceof Error ? err.message : 'Failed to add to cart');
+            setError(typeof err === 'string' ? err : 'Failed to add to cart');
+            setAddedToCart(false);
         } finally {
             setAddingToCart(false);
         }
@@ -108,28 +113,31 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                             {/* Main Image */}
                             <div className="aspect-square relative rounded-lg overflow-hidden bg-secondary">
                                 <ProductImage
-                                    src={selectedImage || product.main_image}
+                                    src={selectedImage || product.main_image || '/images/placeholder.jpg'}
                                     alt={product.name}
                                     priority
                                 />
                             </div>
 
                             {/* Image Thumbnails */}
-                            <div className="grid grid-cols-6 gap-2">
-                                {product.images.map((image) => (
-                                    <button
-                                        key={image.id}
-                                        onClick={() => setSelectedImage(image.image)}
-                                        className={`aspect-square relative rounded-lg overflow-hidden ${selectedImage === image.image ? 'ring-2 ring-foreground' : ''
+                            {product.images && product.images.length > 0 && (
+                                <div className="grid grid-cols-6 gap-2">
+                                    {product.images.map((image: ProductImageType) => (
+                                        <button
+                                            key={image.id}
+                                            onClick={() => setSelectedImage(image.image)}
+                                            className={`aspect-square relative rounded-lg overflow-hidden ${
+                                                selectedImage === image.image ? 'ring-2 ring-foreground' : ''
                                             }`}
-                                    >
-                                        <ProductImage
-                                            src={image.image}
-                                            alt={product.name}
-                                        />
-                                    </button>
-                                ))}
-                            </div>
+                                        >
+                                            <ProductImage
+                                                src={image.image || '/images/placeholder.jpg'}
+                                                alt={product.name}
+                                            />
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -157,45 +165,49 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                         </div>
 
                         {/* Size Selection */}
-                        <div>
-                            <div className="flex justify-between items-center mb-2">
-                                <span className="font-medium text-foreground">Size</span>
-                                <button className="text-sm text-foreground/70 hover:text-foreground">Size Guide</button>
-                            </div>
-                            <div className="grid grid-cols-4 gap-2">
-                                {product.available_sizes.map((size) => (
-                                    <button
-                                        key={size.id}
-                                        onClick={() => setSelectedSize(size)}
-                                        className={`py-2 rounded border ${selectedSize?.id === size.id
-                                                ? 'border-foreground bg-foreground text-background'
-                                                : 'border-foreground/30 text-foreground hover:border-foreground'
+                        {product.available_sizes && product.available_sizes.length > 0 && (
+                            <div>
+                                <div className="flex justify-between items-center mb-2">
+                                    <span className="font-medium text-foreground">Size</span>
+                                    <button className="text-sm text-foreground/70 hover:text-foreground">Size Guide</button>
+                                </div>
+                                <div className="grid grid-cols-4 gap-2">
+                                    {product.available_sizes.map((size: Size) => (
+                                        <button
+                                            key={size.id}
+                                            onClick={() => setSelectedSize(size)}
+                                            className={`py-2 border rounded ${
+                                                selectedSize?.id === size.id ? 'border-foreground' : 'border-foreground/30'
                                             }`}
-                                    >
-                                        {size.name}
-                                    </button>
-                                ))}
+                                        >
+                                            {size.name}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
+                        )}
 
                         {/* Color Selection */}
-                        <div>
-                            <span className="font-medium text-foreground block mb-2">Color</span>
-                            <div className="flex flex-wrap gap-2">
-                                {product.available_colors.map((color) => (
-                                    <button
-                                        key={color.id}
-                                        onClick={() => setSelectedColor(color)}
-                                        className={`w-10 h-10 rounded-full border-2 ${selectedColor?.id === color.id
-                                                ? 'border-foreground'
-                                                : 'border-transparent hover:border-foreground/30'
+                        {product.available_colors && product.available_colors.length > 0 && (
+                            <div>
+                                <span className="font-medium text-foreground block mb-2">Color</span>
+                                <div className="flex flex-wrap gap-2">
+                                    {product.available_colors.map((color: Color) => (
+                                        <button
+                                            key={color.id}
+                                            onClick={() => setSelectedColor(color)}
+                                            className={`w-10 h-10 rounded-full border-2 ${
+                                                selectedColor?.id === color.id
+                                                    ? 'border-foreground'
+                                                    : 'border-transparent hover:border-foreground/30'
                                             }`}
-                                        style={{ backgroundColor: color.code }}
-                                        title={color.name}
-                                    />
-                                ))}
+                                            style={{ backgroundColor: color.code }}
+                                            title={color.name}
+                                        />
+                                    ))}
+                                </div>
                             </div>
-                        </div>
+                        )}
 
                         {/* Quantity Selection */}
                         <div>
@@ -219,14 +231,32 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                             </div>
                         </div>
 
+                        {/* Error Message */}
+                        {error && (
+                            <div className="bg-red-500/10 border border-red-500 text-red-500 p-3 rounded">
+                                {error}
+                            </div>
+                        )}
+
                         {/* Add to Cart & Wishlist */}
                         <div className="flex gap-4">
                             <button
                                 onClick={handleAddToCart}
-                                disabled={isOutOfStock || addingToCart || !selectedSize || !selectedColor}
-                                className="flex-1 bg-foreground text-background py-3 rounded font-medium hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                                disabled={isOutOfStock || addingToCart || !selectedSize || !selectedColor || addedToCart}
+                                className={`flex-1 py-3 rounded font-medium transition-colors ${
+                                    addedToCart 
+                                        ? 'bg-green-500 text-white cursor-default'
+                                        : 'bg-foreground text-background hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed'
+                                }`}
                             >
-                                {isOutOfStock ? 'Out of Stock' : addingToCart ? 'Adding...' : 'Add to Cart'}
+                                {isOutOfStock 
+                                    ? 'Out of Stock' 
+                                    : addingToCart 
+                                        ? 'Adding...' 
+                                        : addedToCart
+                                            ? 'Added to Cart'
+                                            : 'Add to Cart'
+                                }
                             </button>
                             <button
                                 className="p-3 border border-foreground/30 rounded hover:border-foreground"
@@ -261,11 +291,11 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                 </div>
 
                 {/* Similar Products */}
-                {product.related_products.length > 0 && (
+                {product.related_products && product.related_products.length > 0 && (
                     <div className="mt-16">
                         <h2 className="text-2xl font-bold text-foreground mb-6">You may also like</h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                            {product.related_products.map((relatedProduct) => (
+                            {product.related_products.map((relatedProduct: ProductList) => (
                                 <ProductCard
                                     key={relatedProduct.id}
                                     id={relatedProduct.id}
@@ -273,7 +303,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                                     slug={relatedProduct.slug}
                                     price={relatedProduct.price}
                                     salePrice={relatedProduct.sale_price}
-                                    mainImage={relatedProduct.main_image}
+                                    mainImage={relatedProduct.main_image || '/images/placeholder.jpg'}
                                     discountPercent={relatedProduct.discount_percent}
                                     categoryName={relatedProduct.category_name}
                                     brand={relatedProduct.brand}

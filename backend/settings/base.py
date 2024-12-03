@@ -59,6 +59,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'apps.core.middleware.SecurityHeadersMiddleware',
+    'apps.cart.middleware.CartMiddleware',
     'apps.core.middleware.TransactionMiddleware',
     'django_prometheus.middleware.PrometheusAfterMiddleware',
 ]
