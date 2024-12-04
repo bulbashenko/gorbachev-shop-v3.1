@@ -14,18 +14,18 @@ import {
 import LanguageMenu from './LanguageMenu';
 import CurrencyMenu from './CurrencyMenu';
 import ThemeSwitcher from './ThemeSwitcher';
-
+import { dm_sans } from '../utils/fontConfig';
 export default function Header() {
   const t = useTranslations();
   const totalQuantity = 0;
 
   return (
     <header className="">
-      <div className="container mx-auto py-4 px-6">
+      <div className="container mx-auto py-4 px-4">
         {/* Mobile Header */}
         <div className="flex items-center justify-center lg:hidden">
           <div className="text-2xl font-bold">
-            <Link href="/" className="cursor-pointer">
+            <Link href="/" className={`${dm_sans.className} cursor-pointer`}>
               gorbachev.
             </Link>
           </div>
@@ -35,7 +35,7 @@ export default function Header() {
         <div className="hidden lg:flex items-center justify-between">
           {/* Блок 1: Логотип */}
           <div className="text-2xl font-bold">
-            <Link href="/" className="cursor-pointer logo-font">
+            <Link href="/" className={`${dm_sans.className} cursor-pointer`}>
               gorbachev.
             </Link>
           </div>

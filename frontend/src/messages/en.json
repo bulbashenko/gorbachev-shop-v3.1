@@ -25,5 +25,16 @@
     "accessories": "Accessories",
     "mobAccessories": "EXTRA",
     "information": "About"
+  },
+  
+  "auth": {
+    "logIn": "LOG IN",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot your password?",
+    "signIn": "Sign In",
+    "newCustomers": "NEW CUSTOMERS",
+    "newCustomersDescription": "Sign up for early Sale access plus tailored new arrivals, trends and promotions. To opt out, click unsubscribe in our emails.",
+    "register": "Register"
   }
 }

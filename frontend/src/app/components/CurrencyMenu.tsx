@@ -75,7 +75,7 @@ const CurrencyMenu: React.FC = () => {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 rounded shadow-lg z-50">
+        <div className="bg-background absolute right-0 mt-2 rounded shadow-lg z-50">
           {currencies.map((curr) => (
             <button
               key={curr.code}

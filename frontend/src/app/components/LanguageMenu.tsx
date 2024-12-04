@@ -70,7 +70,7 @@ const LanguageMenu: React.FC = () => {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 rounded shadow-lg z-50">
+        <div className="absolute bg-background right-0 mt-2 rounded shadow-lg z-50">
           {languages.map((language) => (
             <button
               key={language.code}

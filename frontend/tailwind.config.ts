@@ -8,15 +8,6 @@ export default {
   ],
   theme: {
     extend: {
-      keyframes: {
-        pulsate: {
-          '0%, 100%': { filter: 'brightness(100%)' },
-          '50%': { filter: 'brightness(110%)' },
-        },
-      },
-      animation: {
-        'pulsate-slow': 'pulsate 5s infinite',
-      },
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
@@ -25,7 +16,5 @@ export default {
     },
   },
   darkMode: "class",
-  plugins: [
-    require('tailwindcss-animate')
-  ],
+  plugins: [],
 } satisfies Config;
