@@ -53,7 +53,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       <body>
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="dark"
           enableSystem
         >
             <Providers initialLocale={localeFromCookie} initialMessages={messages}>

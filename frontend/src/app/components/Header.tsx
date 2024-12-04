@@ -1,6 +1,6 @@
 // src/components/Header.tsx
 
-'use client'
+'use client';
 
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
@@ -11,10 +11,12 @@ import {
   FiShoppingCart,
   FiSearch,
 } from 'react-icons/fi';
-import LanguageMenu from './LanguageMenu'; // Импорт компонента LanguageMenu
+import LanguageMenu from './LanguageMenu';
+import CurrencyMenu from './CurrencyMenu';
+import ThemeSwitcher from './ThemeSwitcher';
 
 export default function Header() {
-  const t = useTranslations(); // Использует текущий контекст перевода
+  const t = useTranslations();
   const totalQuantity = 0;
 
   return (
@@ -24,25 +26,27 @@ export default function Header() {
         <div className="flex items-center justify-center lg:hidden">
           <div className="text-2xl font-bold">
             <Link href="/" className="cursor-pointer">
-              gorbachev
+              gorbachev.
             </Link>
           </div>
         </div>
 
         {/* Desktop Header */}
         <div className="hidden lg:flex items-center justify-between">
+          {/* Блок 1: Логотип */}
           <div className="text-2xl font-bold">
-            <Link href="/" className="cursor-pointer">
-              gorbachev
+            <Link href="/" className="cursor-pointer logo-font">
+              gorbachev.
             </Link>
           </div>
 
+          {/* Блок 2: Ссылки на товары */}
           <nav className="flex space-x-6">
             {navigationLinks.map(({ href, labelKey }) => (
               <Link
                 key={href}
                 href={href}
-                className="text-base lg:text-sm xl:text-lg" // Изменён размер текста
+                className="text-base lg:text-sm xl:text-lg"
               >
                 {t(labelKey)}
               </Link>
@@ -52,23 +56,17 @@ export default function Header() {
             </Link>
           </nav>
 
-          <div className="flex items-center space-x-4 relative">
-            {/* Search Icon */}
+          {/* Блок 3: Иконки аккаунт, поиск и т.д. */}
+          <div className="flex items-center space-x-4">
             <Link href="/search" className="relative">
               <FiSearch className="w-6 h-6" />
             </Link>
-
-            {/* Account Link */}
             <Link href="/auth" className="relative">
               <FiUser className="w-6 h-6" />
             </Link>
-
-            {/* Favorites Icon */}
             <Link href="/favorites" className="relative">
               <FiHeart className="w-6 h-6" />
             </Link>
-
-            {/* Cart Icon */}
             <Link href="/cart" className="relative">
               <FiShoppingCart className="w-6 h-6" />
               {totalQuantity > 0 && (
@@ -77,9 +75,13 @@ export default function Header() {
                 </span>
               )}
             </Link>
+          </div>
 
-            {/* Language Menu */}
-            <LanguageMenu /> {/* Добавлен компонент LanguageMenu */}
+          {/* Блок 4: Переключатели */}
+          <div className="flex items-center space-x-4">
+            <LanguageMenu />
+            <CurrencyMenu />
+            <ThemeSwitcher />
           </div>
         </div>
       </div>

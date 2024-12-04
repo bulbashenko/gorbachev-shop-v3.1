@@ -1,38 +1,41 @@
-// src/app/components/ThemeSwitcher.tsx
+// src/components/ThemeSwitcher.tsx
 'use client';
 
-import { useTheme } from 'next-themes';
-import { SunIcon, MoonIcon } from '@heroicons/react/24/solid'; // Иконки для переключателя
-import { useTranslations } from 'next-intl';
-
+import { useEffect, useState } from 'react';
+import { FiSun, FiMoon } from 'react-icons/fi';
 
 const ThemeSwitcher: React.FC = () => {
-  const { setTheme, resolvedTheme } = useTheme();
-  const t = useTranslations();
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+
+  // Инициализация темы из localStorage или по умолчанию 'light'
+  useEffect(() => {
+    const storedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
+    const preferredTheme = storedTheme || 'light';
+    setTheme(preferredTheme);
+    applyTheme(preferredTheme);
+  }, []);
+
+  const applyTheme = (newTheme: 'light' | 'dark') => {
+    if (newTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+      document.documentElement.style.colorScheme = 'dark';
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.documentElement.style.colorScheme = 'light';
+    }
+  };
 
   const toggleTheme = () => {
-    setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    applyTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
   };
 
   return (
-    <div className="flex items-center space-x-2 mt-4">
-      <span className="text-sm">{t("theme")}</span>
-      <button
-        onClick={toggleTheme}
-        className="relative inline-flex items-center h-6 rounded-full w-11 bg-gray-300 dark:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-      >
-        <span
-          className={`${
-            resolvedTheme === 'dark' ? 'translate-x-6' : 'translate-x-1'
-          } inline-block w-4 h-4 transform bg-white rounded-full transition-transform`}
-        />
-      </button>
-      {resolvedTheme === 'dark' ? (
-        <MoonIcon className="w-5 h-5 text-gray-200" />
-      ) : (
-        <SunIcon className="w-5 h-5 text-yellow-500" />
-      )}
-    </div>
+    <button onClick={toggleTheme} className="focus:outline-none">
+      {theme === 'light' ? <FiMoon className="w-5 h-5" /> : <FiSun className="w-5 h-5" />}
+    </button>
   );
 };
 
