@@ -1,0 +1,32 @@
+{
+    "hello": "Привет",
+    "welcome": "Добро пожаловать в наш магазин!",
+    "theme": "Тёмная тема",
+    "logoAlt": "Логотип",
+    "nav": {
+        "home": "Главная",
+        "about": "О нас",
+        "contact": "Контакты"
+    },
+    "buttons": {
+        "login": "Войти"
+    },
+    "navigation": {
+        "allProducts": "Все товары",
+        "mobAllProducts": "ВСЕ",
+        "sweaters": "Свитеры",
+        "mobSweaters": "СВИТЕРЫ",
+        "pants": "Штаны",
+        "mobPants": "ШТАНЫ",
+        "bags": "Сумки",
+        "mobBags": "СУМКИ",
+        "tshirts": "Футболки",
+        "mobTshirts": "ФУТБОЛКИ",
+        "accessories": "Аксессуары",
+        "mobAccessories": "АКСЕССУАРЫ",
+        "information": "О нас"
+    },
+    "title": "Страница не найдена",
+    "description": "Извините, страница, которую вы ищете, не существует или была перемещена.",
+    "homeButton": "Вернуться на главную"
+}

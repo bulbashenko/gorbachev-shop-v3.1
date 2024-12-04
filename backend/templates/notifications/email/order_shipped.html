@@ -1,0 +1,9 @@
+{% extends "notifications/email/base.html" %}
+{% block title %}Order Shipped - {{ order.order_number }}{% endblock %}
+{% block content %}
+<h2>Your Order is on its Way!</h2>
+<p>Hi {{ user.first_name }},</p>
+<p>Great news! Your order has been shipped and is on its way to you.</p>
+<p><strong>Tracking Number:</strong> {{ order.tracking_number }}</p>
+{% include "notifications/email/includes/order_details.html" %}
+{% endblock %}

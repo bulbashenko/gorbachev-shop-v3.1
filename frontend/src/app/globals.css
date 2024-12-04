@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Hide scrollbar for Chrome, Safari, and Opera */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge, and Firefox */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.light {
+  --background: #ffffff;
+  --foreground: #000;
+  --secondary: #F2F2F2;
+}
+
+.dark {
+  --background: #030303;
+  --foreground: #ededed;
+  --secondary: #505050;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+}
