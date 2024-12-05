@@ -1,34 +1,36 @@
-import uuid
+from django.utils.deprecation import MiddlewareMixin
 from .models import Cart
+import uuid
 
-class CartMiddleware:
-    def __init__(self, get_response):
-        self.get_response = get_response
-
-    def __call__(self, request):
-        if request.user.is_anonymous:
-            cart_session_id = request.session.get('cart_id')
-            if not cart_session_id:
-                cart_session_id = str(uuid.uuid4())
-                request.session['cart_id'] = cart_session_id
-            
-            try:
-                cart = Cart.objects.get(session_id=cart_session_id)
-            except Cart.DoesNotExist:
-                cart = Cart.objects.create(session_id=cart_session_id)
-            
-            request.cart = cart
-        else:
+class CartMiddleware(MiddlewareMixin):
+    def process_request(self, request):
+        if request.user.is_authenticated:
             cart, created = Cart.objects.get_or_create(user=request.user)
-            # Если пользователь только что авторизовался
-            if 'cart_id' in request.session:
-                guest_cart = Cart.objects.filter(
-                    session_id=request.session['cart_id']
-                ).first()
-                if guest_cart:
-                    guest_cart.transfer_to_user(request.user)
-                del request.session['cart_id']
-            request.cart = cart
+            if created:
+                # Если у пользователя была гостевая корзина, переносим товары
+                session_id = request.session.get('cart_id')
+                if session_id:
+                    try:
+                        guest_cart = Cart.objects.get(session_id=session_id)
+                        guest_cart.transfer_to_user(request.user)
+                        request.session.pop('cart_id')
+                    except Cart.DoesNotExist:
+                        pass
+        else:
+            session_id = request.session.get('cart_id')
+            if session_id:
+                try:
+                    cart = Cart.objects.get(session_id=session_id)
+                except Cart.DoesNotExist:
+                    cart = self._create_guest_cart(request)
+            else:
+                cart = self._create_guest_cart(request)
 
-        response = self.get_response(request)
-        return response
+        request.cart = cart
+
+    def _create_guest_cart(self, request):
+        """Создание корзины для гостя"""
+        session_id = str(uuid.uuid4())
+        cart = Cart.objects.create(session_id=session_id)
+        request.session['cart_id'] = session_id
+        return cart

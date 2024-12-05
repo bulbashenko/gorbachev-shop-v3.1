@@ -1,210 +1,261 @@
-from rest_framework import viewsets, filters
-from rest_framework.permissions import AllowAny
+from rest_framework import viewsets, status, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django.db.models import Count, Q, Min, Max
+from rest_framework.permissions import AllowAny
+from django.db.models import Q, Prefetch, Count
+from django.core.cache import cache
+from django.utils.text import slugify
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema, OpenApiParameter
-from .models import Product, ProductVariant, Size, Color
+from .models import Product, ProductVariant, ProductImage, Size, Color
 from .serializers import (
     ProductListSerializer,
     ProductDetailSerializer,
-    ProductVariantSerializer
+    ProductVariantSerializer,
+    SizeSerializer,
+    ColorSerializer
 )
 from .filters import ProductFilter
 
 @extend_schema(tags=['products'])
-class ProductViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    ViewSet для управления товарами.
-    Предоставляет только операции чтения.
-    """
-    queryset = Product.objects.filter(is_active=True)
+class ProductViewSet(viewsets.ModelViewSet):
+    """ViewSet для управления товарами"""
     permission_classes = [AllowAny]
-    filter_backends = [
-        DjangoFilterBackend,
-        filters.SearchFilter,
-        filters.OrderingFilter
-    ]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_class = ProductFilter
     search_fields = ['name', 'description', 'brand']
-    ordering_fields = [
-        'name', 'price', 'created_at',
-        'sale_price'
-    ]
+    ordering_fields = ['price', 'created_at', 'name']
     ordering = ['-created_at']
+
+    def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Product.objects.none()
+
+        # Базовый queryset с оптимизированными запросами
+        queryset = Product.objects.filter(
+            is_active=True
+        ).select_related(
+            'category'
+        ).prefetch_related(
+            Prefetch(
+                'variants',
+                queryset=ProductVariant.objects.select_related('size', 'color')
+            ),
+            Prefetch(
+                'images',
+                queryset=ProductImage.objects.filter(is_main=True)
+            )
+        )
+
+        # Фильтрация по наличию
+        in_stock = self.request.query_params.get('in_stock')
+        if in_stock:
+            queryset = queryset.filter(variants__stock__gt=0).distinct()
+
+        # Фильтрация по цене
+        min_price = self.request.query_params.get('min_price')
+        max_price = self.request.query_params.get('max_price')
+        if min_price:
+            queryset = queryset.filter(price__gte=min_price)
+        if max_price:
+            queryset = queryset.filter(price__lte=max_price)
+
+        return queryset
 
     def get_serializer_class(self):
         if self.action == 'list':
             return ProductListSerializer
         return ProductDetailSerializer
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        queryset = queryset.prefetch_related(
-            'variants',
-            'variants__size',
-            'variants__color',
-            'images'
-        )
-        return queryset
+    def get_object(self):
+        """
+        Получение объекта с использованием кеширования
+        """
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+        lookup_value = self.kwargs[lookup_url_kwarg]
 
-    @extend_schema(
-        summary="Get available filters",
-        description="Returns available filter options with counts and price ranges",
-        responses={200: {
-            "type": "object",
-            "properties": {
-                "price_range": {
-                    "type": "object",
-                    "properties": {
-                        "min_price": {"type": "number"},
-                        "max_price": {"type": "number"}
-                    }
-                },
-                "sizes": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "id": {"type": "integer"},
-                            "name": {"type": "string"},
-                            "count": {"type": "integer"}
-                        }
-                    }
-                },
-                "colors": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "id": {"type": "integer"},
-                            "name": {"type": "string"},
-                            "code": {"type": "string"},
-                            "count": {"type": "integer"}
-                        }
-                    }
-                },
-                "brands": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "brand": {"type": "string"},
-                            "count": {"type": "integer"}
-                        }
-                    }
-                },
-                "on_sale_count": {"type": "integer"},
-                "in_stock_count": {"type": "integer"}
-            }
-        }}
-    )
-    @action(detail=False, methods=['get'])
-    def filters(self, request):
-        """Получение доступных фильтров с количеством товаров"""
-        queryset = self.filter_queryset(self.get_queryset())
-        
-        # Get price range
-        price_range = queryset.aggregate(
-            min_price=Min('price'),
-            max_price=Max('price')
-        )
+        # Пытаемся получить из кеша
+        cache_key = f'product_{lookup_value}'
+        product = cache.get(cache_key)
 
-        # Get available sizes with count
-        sizes = Size.objects.filter(
-            productvariant__product__in=queryset
-        ).annotate(
-            count=Count('productvariant__product', distinct=True)
-        ).values('id', 'name', 'count')
+        if not product:
+            product = super().get_object()
+            # Кешируем на 1 час
+            cache.set(cache_key, product, 3600)
 
-        # Get available colors with count
-        colors = Color.objects.filter(
-            productvariant__product__in=queryset
-        ).annotate(
-            count=Count('productvariant__product', distinct=True)
-        ).values('id', 'name', 'code', 'count')
+        return product
 
-        # Get brands with count
-        brands = queryset.values('brand').annotate(
-            count=Count('id')
-        )
+    def list(self, request, *args, **kwargs):
+        """
+        Получение списка товаров с кешированием
+        """
+        # Формируем ключ кеша на основе параметров запроса
+        cache_key = f'products_list_{request.query_params.urlencode()}'
+        response_data = cache.get(cache_key)
 
-        # Count on sale items
-        on_sale_count = queryset.filter(
-            sale_price__isnull=False
-        ).count()
+        if not response_data:
+            queryset = self.filter_queryset(self.get_queryset())
+            page = self.paginate_queryset(queryset)
+            
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                response_data = self.get_paginated_response(serializer.data).data
+            else:
+                serializer = self.get_serializer(queryset, many=True)
+                response_data = serializer.data
 
-        # Count in stock items
-        in_stock_count = queryset.filter(
-            variants__stock__gt=0
-        ).distinct().count()
+            # Кешируем на 15 минут
+            cache.set(cache_key, response_data, 900)
 
-        return Response({
-            'price_range': price_range,
-            'sizes': sizes,
-            'colors': colors,
-            'brands': brands,
-            'on_sale_count': on_sale_count,
-            'in_stock_count': in_stock_count
-        })
+        return Response(response_data)
 
     @extend_schema(
         summary="Get product variants",
-        description="Returns available variants for the product",
+        description="Получение вариантов товара",
         responses={200: ProductVariantSerializer(many=True)}
     )
     @action(detail=True, methods=['get'])
     def variants(self, request, pk=None):
-        """Получение доступных вариантов товара"""
+        """
+        Получение вариантов товара с фильтрацией по размеру и цвету
+        """
         product = self.get_object()
-        variants = product.variants.all()
+        
+        # Фильтрация по размеру и цвету
+        size = request.query_params.get('size')
+        color = request.query_params.get('color')
+        in_stock = request.query_params.get('in_stock')
+
+        variants = product.variants.select_related('size', 'color')
+
+        if size:
+            variants = variants.filter(size__name=size)
+        if color:
+            variants = variants.filter(color__name=color)
+        if in_stock:
+            variants = variants.filter(stock__gt=0)
+
         serializer = ProductVariantSerializer(variants, many=True)
         return Response(serializer.data)
 
     @extend_schema(
-        summary="Check variant availability",
-        description="Checks if specific variant is available",
-        parameters=[
-            OpenApiParameter(
-                name="size",
-                description="Size ID",
-                required=True,
-                type=int
-            ),
-            OpenApiParameter(
-                name="color",
-                description="Color ID",
-                required=True,
-                type=int
-            )
-        ],
-        responses={200: {
-            "type": "object",
-            "properties": {
-                "available": {"type": "boolean"},
-                "stock": {"type": "integer"}
-            }
-        }}
+        summary="Get available sizes",
+        description="Получение доступных размеров товара",
+        responses={200: SizeSerializer(many=True)}
     )
     @action(detail=True, methods=['get'])
-    def check_availability(self, request, pk=None):
-        """Проверка наличия конкретного варианта"""
+    def sizes(self, request, pk=None):
+        """
+        Получение доступных размеров товара
+        """
         product = self.get_object()
-        size_id = request.query_params.get('size')
-        color_id = request.query_params.get('color')
-        
+        color = request.query_params.get('color')
+        in_stock = request.query_params.get('in_stock')
+
+        sizes = Size.objects.filter(
+            productvariant__product=product
+        )
+
+        if color:
+            sizes = sizes.filter(productvariant__color__name=color)
+        if in_stock:
+            sizes = sizes.filter(productvariant__stock__gt=0)
+
+        sizes = sizes.distinct()
+        serializer = SizeSerializer(sizes, many=True)
+        return Response(serializer.data)
+
+    @extend_schema(
+        summary="Get available colors",
+        description="Получение доступных цветов товара",
+        responses={200: ColorSerializer(many=True)}
+    )
+    @action(detail=True, methods=['get'])
+    def colors(self, request, pk=None):
+        """
+        Получение доступных цветов товара
+        """
+        product = self.get_object()
+        size = request.query_params.get('size')
+        in_stock = request.query_params.get('in_stock')
+
+        colors = Color.objects.filter(
+            productvariant__product=product
+        )
+
+        if size:
+            colors = colors.filter(productvariant__size__name=size)
+        if in_stock:
+            colors = colors.filter(productvariant__stock__gt=0)
+
+        colors = colors.distinct()
+        serializer = ColorSerializer(colors, many=True)
+        return Response(serializer.data)
+
+    @extend_schema(
+        summary="Check stock",
+        description="Проверка наличия товара",
+        responses={
+            200: {
+                "type": "object",
+                "properties": {
+                    "in_stock": {"type": "boolean"},
+                    "available_quantity": {"type": "integer"}
+                }
+            }
+        }
+    )
+    @action(detail=True, methods=['get'])
+    def check_stock(self, request, pk=None):
+        """
+        Проверка наличия товара с указанными параметрами
+        """
+        product = self.get_object()
+        size = request.query_params.get('size')
+        color = request.query_params.get('color')
+
         try:
             variant = product.variants.get(
-                size_id=size_id,
-                color_id=color_id
+                size__name=size,
+                color__name=color
             )
             return Response({
-                'available': variant.stock > 0,
-                'stock': variant.stock
+                'in_stock': variant.stock > 0,
+                'available_quantity': variant.stock
             })
         except ProductVariant.DoesNotExist:
             return Response({
-                'available': False,
-                'stock': 0
+                'in_stock': False,
+                'available_quantity': 0
             })
+
+    @extend_schema(
+        summary="Similar products",
+        description="Получение похожих товаров",
+        responses={200: ProductListSerializer(many=True)}
+    )
+    @action(detail=True, methods=['get'])
+    def similar(self, request, pk=None):
+        """
+        Получение похожих товаров на основе категории и характеристик
+        """
+        product = self.get_object()
+        cache_key = f'similar_products_{product.id}'
+        similar_products = cache.get(cache_key)
+
+        if not similar_products:
+            # Находим похожие товары
+            similar_products = Product.objects.filter(
+                Q(category=product.category) |
+                Q(brand=product.brand)
+            ).exclude(
+                id=product.id
+            ).filter(
+                is_active=True
+            ).distinct()[:5]
+
+            # Кешируем на 1 час
+            cache.set(cache_key, similar_products, 3600)
+
+        serializer = ProductListSerializer(similar_products, many=True)
+        return Response(serializer.data)

@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     
     # Local apps
+    'docs.apps.DocsConfig',  # Add docs app
     'apps.users',
     'apps.products',
     'apps.categories',
@@ -58,6 +59,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'apps.core.middleware.SecurityHeadersMiddleware',
+    'apps.cart.middleware.CartMiddleware',
     'apps.core.middleware.TransactionMiddleware',
     'django_prometheus.middleware.PrometheusAfterMiddleware',
 ]
@@ -231,8 +233,6 @@ EMAIL_SETTINGS = {
 
 SITE_URL = os.environ.get('SITE_URL', 'http://localhost:8000')
 
-
-
 # Static files
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
@@ -259,6 +259,21 @@ REST_FRAMEWORK = {
         'payment': '100/day',
     },
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+# Spectacular settings for API documentation
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Gorbachev Shop API',
+    'DESCRIPTION': 'API documentation for Gorbachev Shop',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'SWAGGER_UI_SETTINGS': {
+        'deepLinking': True,
+        'persistAuthorization': True,
+        'displayOperationId': True,
+    },
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SCHEMA_PATH_PREFIX': '/api/',
 }
 
 # JWT settings

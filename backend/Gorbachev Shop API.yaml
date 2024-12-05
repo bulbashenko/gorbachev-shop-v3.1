@@ -1,0 +1,4379 @@
+openapi: 3.0.3
+info:
+  title: Gorbachev Shop API
+  version: 1.0.0
+  description: API documentation for Gorbachev Shop
+paths:
+  /api/analytics/analytics/category_performance/:
+    get:
+      operationId: analytics_analytics_category_performance_retrieve
+      description: Получение статистики по категориям
+      tags:
+      - analytics
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/analytics/analytics/chart_data/:
+    get:
+      operationId: analytics_analytics_chart_data_retrieve
+      description: Получение данных для графиков
+      tags:
+      - analytics
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/analytics/analytics/customer_segments/:
+    get:
+      operationId: analytics_analytics_customer_segments_retrieve
+      description: Получение сегментации клиентов
+      tags:
+      - analytics
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/analytics/analytics/dashboard/:
+    get:
+      operationId: analytics_analytics_dashboard_retrieve
+      description: Получение данных для дашборда
+      tags:
+      - analytics
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/analytics/analytics/export_report/:
+    get:
+      operationId: analytics_analytics_export_report_retrieve
+      description: Экспорт отчета в Excel
+      tags:
+      - analytics
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/analytics/analytics/product_performance/:
+    get:
+      operationId: analytics_analytics_product_performance_retrieve
+      description: Получение статистики по продуктам
+      tags:
+      - analytics
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/analytics/analytics/sales_report/:
+    get:
+      operationId: analytics_analytics_sales_report_retrieve
+      description: Получение отчета о продажах
+      tags:
+      - analytics
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/cart/cart/:
+    get:
+      operationId: cart_cart_list
+      description: ViewSet для управления корзиной покупок
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - cart
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCartList'
+          description: ''
+    post:
+      operationId: cart_cart_create
+      description: ViewSet для управления корзиной покупок
+      tags:
+      - cart
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+          description: ''
+  /api/cart/cart/{id}/:
+    get:
+      operationId: cart_cart_retrieve
+      description: ViewSet для управления корзиной покупок
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this cart.
+        required: true
+      tags:
+      - cart
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+          description: ''
+    put:
+      operationId: cart_cart_update
+      description: ViewSet для управления корзиной покупок
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this cart.
+        required: true
+      tags:
+      - cart
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+          description: ''
+    patch:
+      operationId: cart_cart_partial_update
+      description: ViewSet для управления корзиной покупок
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this cart.
+        required: true
+      tags:
+      - cart
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+          description: ''
+    delete:
+      operationId: cart_cart_destroy
+      description: ViewSet для управления корзиной покупок
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this cart.
+        required: true
+      tags:
+      - cart
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/cart/cart/{id}/remove_item/:
+    delete:
+      operationId: cart_cart_remove_item_destroy
+      description: Удаляет товар из корзины
+      summary: Remove item from cart
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this cart.
+        required: true
+      tags:
+      - cart
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/cart/cart/{id}/update_quantity/:
+    patch:
+      operationId: cart_cart_update_quantity_partial_update
+      description: Обновляет количество товара в корзине с проверкой наличия
+      summary: Update item quantity
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this cart.
+        required: true
+      tags:
+      - cart
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quantity:
+                  type: integer
+                  minimum: 1
+              required:
+              - quantity
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartItem'
+          description: ''
+        '400':
+          description: Invalid quantity or out of stock
+        '404':
+          description: Item not found
+  /api/cart/cart/add_item/:
+    post:
+      operationId: cart_cart_add_item_create
+      description: Добавляет товар в корзину с проверкой наличия
+      summary: Add item to cart
+      tags:
+      - cart
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CartItemRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CartItemRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CartItemRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartItem'
+          description: ''
+        '400':
+          description: Invalid input or out of stock
+        '404':
+          description: Product variant not found
+  /api/cart/cart/clear/:
+    post:
+      operationId: cart_cart_clear_create
+      description: Очищает корзину
+      summary: Clear cart
+      tags:
+      - cart
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/cart/cart/transfer_to_user/:
+    post:
+      operationId: cart_cart_transfer_to_user_create
+      description: Переносит гостевую корзину к пользователю
+      summary: Transfer guest cart
+      tags:
+      - cart
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+          description: ''
+        '400':
+          description: Transfer failed
+  /api/cart/cart/validate/:
+    get:
+      operationId: cart_cart_validate_retrieve
+      description: Проверяет наличие всех товаров в корзине
+      summary: Validate cart
+      tags:
+      - cart
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: Cart is valid
+        '400':
+          description: Cart validation failed
+  /api/categories/categories/:
+    get:
+      operationId: categories_categories_list
+      description: ViewSet для управления категориями товаров.
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - categories
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCategoryListList'
+          description: ''
+    post:
+      operationId: categories_categories_create
+      description: ViewSet для управления категориями товаров.
+      tags:
+      - categories
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CategoryRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CategoryRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+  /api/categories/categories/{slug}/:
+    get:
+      operationId: categories_categories_retrieve
+      description: ViewSet для управления категориями товаров.
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - categories
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+    put:
+      operationId: categories_categories_update
+      description: ViewSet для управления категориями товаров.
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - categories
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CategoryRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CategoryRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+    patch:
+      operationId: categories_categories_partial_update
+      description: ViewSet для управления категориями товаров.
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - categories
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCategoryRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCategoryRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCategoryRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+    delete:
+      operationId: categories_categories_destroy
+      description: ViewSet для управления категориями товаров.
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - categories
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/categories/categories/menu/:
+    get:
+      operationId: categories_categories_menu_list
+      description: Returns active categories for navigation menu
+      summary: Get menu categories
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - categories
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCategoryListList'
+          description: ''
+  /api/categories/categories/tree/:
+    get:
+      operationId: categories_categories_tree_list
+      description: Returns categories in a hierarchical tree structure
+      summary: Get category tree
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - categories
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCategoryTreeList'
+          description: ''
+  /api/orders/:
+    get:
+      operationId: orders_list
+      description: ViewSet для управления заказами
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - orders
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedOrderList'
+          description: ''
+    post:
+      operationId: orders_create
+      description: ViewSet для управления заказами
+      tags:
+      - orders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OrderRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OrderRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+          description: ''
+  /api/orders/{id}/:
+    get:
+      operationId: orders_retrieve
+      description: ViewSet для управления заказами
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this order.
+        required: true
+      tags:
+      - orders
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+          description: ''
+    put:
+      operationId: orders_update
+      description: ViewSet для управления заказами
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this order.
+        required: true
+      tags:
+      - orders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OrderRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OrderRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+          description: ''
+    patch:
+      operationId: orders_partial_update
+      description: ViewSet для управления заказами
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this order.
+        required: true
+      tags:
+      - orders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedOrderRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedOrderRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedOrderRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+          description: ''
+    delete:
+      operationId: orders_destroy
+      description: ViewSet для управления заказами
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this order.
+        required: true
+      tags:
+      - orders
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/orders/{id}/cancel/:
+    post:
+      operationId: orders_cancel_create
+      description: Отмена заказа с возвратом товаров на склад
+      summary: Cancel order
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this order.
+        required: true
+      tags:
+      - orders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OrderRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OrderRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+          description: ''
+  /api/orders/{id}/tracking/:
+    get:
+      operationId: orders_tracking_retrieve
+      description: Получение информации о статусе заказа
+      summary: Get order tracking
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this order.
+        required: true
+      tags:
+      - orders
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderTracking'
+          description: ''
+  /api/orders/create_from_cart/:
+    post:
+      operationId: orders_create_from_cart_create
+      description: Creates a new order from the current user's cart
+      summary: Create order from cart
+      tags:
+      - orders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OrderCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OrderCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+          description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+          description: ''
+  /api/payments/:
+    get:
+      operationId: payments_list
+      description: Получение списка платежей с кешированием
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - payments
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPaymentList'
+          description: ''
+    post:
+      operationId: payments_create
+      description: ViewSet для управления платежами.
+      tags:
+      - payments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+          description: ''
+  /api/payments/{id}/:
+    get:
+      operationId: payments_retrieve
+      description: ViewSet для управления платежами.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this payment.
+        required: true
+      tags:
+      - payments
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+          description: ''
+    put:
+      operationId: payments_update
+      description: ViewSet для управления платежами.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this payment.
+        required: true
+      tags:
+      - payments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+          description: ''
+    patch:
+      operationId: payments_partial_update
+      description: ViewSet для управления платежами.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this payment.
+        required: true
+      tags:
+      - payments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPaymentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPaymentRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPaymentRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+          description: ''
+    delete:
+      operationId: payments_destroy
+      description: ViewSet для управления платежами.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this payment.
+        required: true
+      tags:
+      - payments
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/payments/{id}/process_payment/:
+    post:
+      operationId: payments_process_payment_create
+      description: Processes the payment for an order
+      summary: Process payment
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this payment.
+        required: true
+      tags:
+      - payments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+          description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+          description: ''
+  /api/payments/{id}/refund/:
+    post:
+      operationId: payments_refund_create
+      description: Processes a refund for a completed payment
+      summary: Refund payment
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this payment.
+        required: true
+      tags:
+      - payments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+          description: ''
+  /api/products/:
+    get:
+      operationId: products_list
+      description: Получение списка товаров с кешированием
+      parameters:
+      - in: query
+        name: brand
+        schema:
+          type: string
+      - in: query
+        name: category
+        schema:
+          type: number
+      - in: query
+        name: category_slug
+        schema:
+          type: string
+      - in: query
+        name: colors
+        schema:
+          type: array
+          items:
+            type: integer
+        explode: true
+        style: form
+      - in: query
+        name: gender
+        schema:
+          type: string
+          enum:
+          - M
+          - U
+          - W
+        description: |-
+          * `M` - Men
+          * `W` - Women
+          * `U` - Unisex
+      - in: query
+        name: in_stock
+        schema:
+          type: boolean
+      - in: query
+        name: is_sale
+        schema:
+          type: boolean
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: price_max
+        schema:
+          type: number
+      - in: query
+        name: price_min
+        schema:
+          type: number
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: sizes
+        schema:
+          type: array
+          items:
+            type: integer
+        explode: true
+        style: form
+      tags:
+      - products
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProductListList'
+          description: ''
+    post:
+      operationId: products_create
+      description: ViewSet для управления товарами
+      tags:
+      - products
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductDetailRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProductDetailRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProductDetailRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDetail'
+          description: ''
+  /api/products/{id}/:
+    get:
+      operationId: products_retrieve
+      description: ViewSet для управления товарами
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this product.
+        required: true
+      tags:
+      - products
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDetail'
+          description: ''
+    put:
+      operationId: products_update
+      description: ViewSet для управления товарами
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this product.
+        required: true
+      tags:
+      - products
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductDetailRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProductDetailRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProductDetailRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDetail'
+          description: ''
+    patch:
+      operationId: products_partial_update
+      description: ViewSet для управления товарами
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this product.
+        required: true
+      tags:
+      - products
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedProductDetailRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedProductDetailRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedProductDetailRequest'
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDetail'
+          description: ''
+    delete:
+      operationId: products_destroy
+      description: ViewSet для управления товарами
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this product.
+        required: true
+      tags:
+      - products
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/products/{id}/check_stock/:
+    get:
+      operationId: products_check_stock_retrieve
+      description: Проверка наличия товара
+      summary: Check stock
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this product.
+        required: true
+      tags:
+      - products
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  in_stock:
+                    type: boolean
+                  available_quantity:
+                    type: integer
+          description: ''
+  /api/products/{id}/colors/:
+    get:
+      operationId: products_colors_list
+      description: Получение доступных цветов товара
+      summary: Get available colors
+      parameters:
+      - in: query
+        name: brand
+        schema:
+          type: string
+      - in: query
+        name: category
+        schema:
+          type: number
+      - in: query
+        name: category_slug
+        schema:
+          type: string
+      - in: query
+        name: colors
+        schema:
+          type: array
+          items:
+            type: integer
+        explode: true
+        style: form
+      - in: query
+        name: gender
+        schema:
+          type: string
+          enum:
+          - M
+          - U
+          - W
+        description: |-
+          * `M` - Men
+          * `W` - Women
+          * `U` - Unisex
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this product.
+        required: true
+      - in: query
+        name: in_stock
+        schema:
+          type: boolean
+      - in: query
+        name: is_sale
+        schema:
+          type: boolean
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: price_max
+        schema:
+          type: number
+      - in: query
+        name: price_min
+        schema:
+          type: number
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: sizes
+        schema:
+          type: array
+          items:
+            type: integer
+        explode: true
+        style: form
+      tags:
+      - products
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedColorList'
+          description: ''
+  /api/products/{id}/similar/:
+    get:
+      operationId: products_similar_list
+      description: Получение похожих товаров
+      summary: Similar products
+      parameters:
+      - in: query
+        name: brand
+        schema:
+          type: string
+      - in: query
+        name: category
+        schema:
+          type: number
+      - in: query
+        name: category_slug
+        schema:
+          type: string
+      - in: query
+        name: colors
+        schema:
+          type: array
+          items:
+            type: integer
+        explode: true
+        style: form
+      - in: query
+        name: gender
+        schema:
+          type: string
+          enum:
+          - M
+          - U
+          - W
+        description: |-
+          * `M` - Men
+          * `W` - Women
+          * `U` - Unisex
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this product.
+        required: true
+      - in: query
+        name: in_stock
+        schema:
+          type: boolean
+      - in: query
+        name: is_sale
+        schema:
+          type: boolean
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: price_max
+        schema:
+          type: number
+      - in: query
+        name: price_min
+        schema:
+          type: number
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: sizes
+        schema:
+          type: array
+          items:
+            type: integer
+        explode: true
+        style: form
+      tags:
+      - products
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProductListList'
+          description: ''
+  /api/products/{id}/sizes/:
+    get:
+      operationId: products_sizes_list
+      description: Получение доступных размеров товара
+      summary: Get available sizes
+      parameters:
+      - in: query
+        name: brand
+        schema:
+          type: string
+      - in: query
+        name: category
+        schema:
+          type: number
+      - in: query
+        name: category_slug
+        schema:
+          type: string
+      - in: query
+        name: colors
+        schema:
+          type: array
+          items:
+            type: integer
+        explode: true
+        style: form
+      - in: query
+        name: gender
+        schema:
+          type: string
+          enum:
+          - M
+          - U
+          - W
+        description: |-
+          * `M` - Men
+          * `W` - Women
+          * `U` - Unisex
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this product.
+        required: true
+      - in: query
+        name: in_stock
+        schema:
+          type: boolean
+      - in: query
+        name: is_sale
+        schema:
+          type: boolean
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: price_max
+        schema:
+          type: number
+      - in: query
+        name: price_min
+        schema:
+          type: number
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: sizes
+        schema:
+          type: array
+          items:
+            type: integer
+        explode: true
+        style: form
+      tags:
+      - products
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSizeList'
+          description: ''
+  /api/products/{id}/variants/:
+    get:
+      operationId: products_variants_list
+      description: Получение вариантов товара
+      summary: Get product variants
+      parameters:
+      - in: query
+        name: brand
+        schema:
+          type: string
+      - in: query
+        name: category
+        schema:
+          type: number
+      - in: query
+        name: category_slug
+        schema:
+          type: string
+      - in: query
+        name: colors
+        schema:
+          type: array
+          items:
+            type: integer
+        explode: true
+        style: form
+      - in: query
+        name: gender
+        schema:
+          type: string
+          enum:
+          - M
+          - U
+          - W
+        description: |-
+          * `M` - Men
+          * `W` - Women
+          * `U` - Unisex
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this product.
+        required: true
+      - in: query
+        name: in_stock
+        schema:
+          type: boolean
+      - in: query
+        name: is_sale
+        schema:
+          type: boolean
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: price_max
+        schema:
+          type: number
+      - in: query
+        name: price_min
+        schema:
+          type: number
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: sizes
+        schema:
+          type: array
+          items:
+            type: integer
+        explode: true
+        style: form
+      tags:
+      - products
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProductVariantList'
+          description: ''
+  /api/users/addresses/:
+    get:
+      operationId: users_addresses_list
+      description: ViewSet for managing user addresses
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - users
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUserAddressList'
+          description: ''
+    post:
+      operationId: users_addresses_create
+      description: ViewSet for managing user addresses
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserAddressRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserAddressRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserAddressRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAddress'
+          description: ''
+  /api/users/addresses/{id}/:
+    get:
+      operationId: users_addresses_retrieve
+      description: ViewSet for managing user addresses
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - users
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAddress'
+          description: ''
+    put:
+      operationId: users_addresses_update
+      description: ViewSet for managing user addresses
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserAddressRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserAddressRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserAddressRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAddress'
+          description: ''
+    patch:
+      operationId: users_addresses_partial_update
+      description: ViewSet for managing user addresses
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserAddressRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserAddressRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserAddressRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAddress'
+          description: ''
+    delete:
+      operationId: users_addresses_destroy
+      description: ViewSet for managing user addresses
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - users
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/users/addresses/{id}/set_default/:
+    post:
+      operationId: users_addresses_set_default_create
+      description: Sets the selected address as default for shipping or billing
+      summary: Set default address
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserAddressRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserAddressRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserAddressRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+          description: ''
+  /api/users/auth/login/:
+    post:
+      operationId: users_auth_login_create
+      description: Enhanced JWT token view with additional security
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomTokenObtainPairRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CustomTokenObtainPairRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CustomTokenObtainPairRequest'
+        required: true
+      responses:
+        '200':
+          description: No response body
+  /api/users/auth/refresh/:
+    post:
+      operationId: users_auth_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+  /api/users/auth/register/:
+    post:
+      operationId: users_auth_register_create
+      description: View for user registration
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Register'
+          description: ''
+  /api/users/auth/verify/:
+    post:
+      operationId: users_auth_verify_create
+      description: |-
+        Takes a token and indicates if it is valid.  This view provides no
+        information about a token's fitness for a particular use.
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenVerifyRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenVerifyRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenVerifyRequest'
+        required: true
+      responses:
+        '200':
+          description: No response body
+  /api/users/users/:
+    get:
+      operationId: users_users_list
+      description: ViewSet for user management
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - users
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUserList'
+          description: ''
+    post:
+      operationId: users_users_create
+      description: ViewSet for user management
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/users/users/{id}/:
+    get:
+      operationId: users_users_retrieve
+      description: ViewSet for user management
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this user.
+        required: true
+      tags:
+      - users
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    put:
+      operationId: users_users_update
+      description: ViewSet for user management
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this user.
+        required: true
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    patch:
+      operationId: users_users_partial_update
+      description: ViewSet for user management
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this user.
+        required: true
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    delete:
+      operationId: users_users_destroy
+      description: ViewSet for user management
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this user.
+        required: true
+      tags:
+      - users
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/users/users/change_password/:
+    post:
+      operationId: users_users_change_password_create
+      description: Changes the current user's password
+      summary: Change password
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordChangeRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordChangeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordChangeRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+          description: ''
+  /api/users/users/me/:
+    get:
+      operationId: users_users_me_retrieve
+      description: Returns the profile of the currently authenticated user
+      summary: Get current user profile
+      tags:
+      - users
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/users/users/request_password_reset/:
+    post:
+      operationId: users_users_request_password_reset_create
+      description: Sends a password reset email to the user
+      summary: Request password reset
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetRequestRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordResetRequestRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordResetRequestRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+          description: ''
+  /api/users/users/resend_verification/:
+    post:
+      operationId: users_users_resend_verification_create
+      description: Resends the verification email for the current user
+      summary: Resend verification email
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+          description: ''
+  /api/users/users/reset_password/:
+    post:
+      operationId: users_users_reset_password_create
+      description: Resets user password using token
+      summary: Reset password
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirmRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirmRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirmRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+          description: ''
+  /api/users/users/update_me/:
+    put:
+      operationId: users_users_update_me_update
+      description: Updates the current user's profile information
+      summary: Update current user profile
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    patch:
+      operationId: users_users_update_me_partial_update
+      description: Updates the current user's profile information
+      summary: Update current user profile
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/users/users/verify_email/:
+    get:
+      operationId: users_users_verify_email_retrieve
+      description: Verifies user email with token
+      summary: Verify email
+      tags:
+      - users
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+          description: ''
+components:
+  schemas:
+    AddressTypeEnum:
+      enum:
+      - shipping
+      - billing
+      type: string
+      description: |-
+        * `shipping` - Shipping
+        * `billing` - Billing
+    BlankEnum:
+      enum:
+      - ''
+    Cart:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CartItem'
+          readOnly: true
+        total_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          readOnly: true
+        total_items:
+          type: integer
+          readOnly: true
+      required:
+      - id
+      - items
+      - total_items
+      - total_price
+    CartItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        variant:
+          allOf:
+          - $ref: '#/components/schemas/ProductVariant'
+          readOnly: true
+        quantity:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        total:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          readOnly: true
+      required:
+      - id
+      - total
+      - variant
+    CartItemRequest:
+      type: object
+      properties:
+        variant_id:
+          type: string
+          format: uuid
+          writeOnly: true
+        quantity:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+      required:
+      - variant_id
+    Category:
+      type: object
+      description: Full category serializer with nested children
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 200
+        slug:
+          type: string
+          maxLength: 255
+          pattern: ^[-a-zA-Z0-9_]+$
+        description:
+          type: string
+        parent:
+          type: string
+          format: uuid
+          nullable: true
+          title: Parent category
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/Category'
+          readOnly: true
+        image:
+          type: string
+          format: uri
+          nullable: true
+          title: Category image
+        icon:
+          type: string
+          description: Icon class name (e.g. "fa fa-home")
+          maxLength: 50
+        is_active:
+          type: boolean
+          title: Active
+        show_in_menu:
+          type: boolean
+        order:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        meta_title:
+          type: string
+          maxLength: 255
+        meta_description:
+          type: string
+        meta_keywords:
+          type: string
+          maxLength: 255
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - children
+      - created_at
+      - id
+      - name
+      - slug
+      - updated_at
+    CategoryList:
+      type: object
+      description: Serializer for basic category information
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 200
+        slug:
+          type: string
+          maxLength: 255
+          pattern: ^[-a-zA-Z0-9_]+$
+        parent:
+          type: string
+          format: uuid
+          nullable: true
+          title: Parent category
+        is_active:
+          type: boolean
+          title: Active
+      required:
+      - id
+      - name
+      - slug
+    CategoryRequest:
+      type: object
+      description: Full category serializer with nested children
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+        slug:
+          type: string
+          minLength: 1
+          maxLength: 255
+          pattern: ^[-a-zA-Z0-9_]+$
+        description:
+          type: string
+        parent:
+          type: string
+          format: uuid
+          nullable: true
+          title: Parent category
+        image:
+          type: string
+          format: binary
+          nullable: true
+          title: Category image
+        icon:
+          type: string
+          description: Icon class name (e.g. "fa fa-home")
+          maxLength: 50
+        is_active:
+          type: boolean
+          title: Active
+        show_in_menu:
+          type: boolean
+        order:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        meta_title:
+          type: string
+          maxLength: 255
+        meta_description:
+          type: string
+        meta_keywords:
+          type: string
+          maxLength: 255
+      required:
+      - name
+      - slug
+    CategoryTree:
+      type: object
+      description: Recursive category serializer for tree structure
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 200
+        slug:
+          type: string
+          maxLength: 255
+          pattern: ^[-a-zA-Z0-9_]+$
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategoryTree'
+          readOnly: true
+        product_count:
+          type: integer
+          readOnly: true
+      required:
+      - children
+      - id
+      - name
+      - product_count
+      - slug
+    Color:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 50
+        code:
+          type: string
+          maxLength: 10
+      required:
+      - code
+      - id
+      - name
+    ColorRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 50
+        code:
+          type: string
+          minLength: 1
+          maxLength: 10
+      required:
+      - code
+      - name
+    CustomTokenObtainPairRequest:
+      type: object
+      description: Enhanced JWT token serializer with additional user info
+      properties:
+        email:
+          type: string
+          writeOnly: true
+          minLength: 1
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - email
+      - password
+    Order:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        order_number:
+          type: string
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/Status0f0Enum'
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        phone:
+          type: string
+          maxLength: 20
+        shipping_address:
+          type: string
+          format: uuid
+        shipping_address_details:
+          type: string
+          readOnly: true
+        billing_address:
+          type: string
+          format: uuid
+          nullable: true
+        shipping_method:
+          $ref: '#/components/schemas/ShippingMethodEnum'
+        shipping_cost:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        tracking_number:
+          type: string
+          nullable: true
+          maxLength: 100
+        subtotal:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          readOnly: true
+        tax:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          readOnly: true
+        total:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          readOnly: true
+        payment_status:
+          allOf:
+          - $ref: '#/components/schemas/PaymentStatusEnum'
+          readOnly: true
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+          readOnly: true
+        status_history:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderStatus'
+          readOnly: true
+        customer_notes:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        paid_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        shipped_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        delivered_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - created_at
+      - delivered_at
+      - email
+      - id
+      - items
+      - order_number
+      - paid_at
+      - payment_status
+      - phone
+      - shipped_at
+      - shipping_address
+      - shipping_address_details
+      - shipping_method
+      - status_history
+      - subtotal
+      - tax
+      - total
+    OrderCreateRequest:
+      type: object
+      properties:
+        shipping_address:
+          type: string
+          format: uuid
+        billing_address:
+          type: string
+          format: uuid
+        shipping_method:
+          $ref: '#/components/schemas/ShippingMethodEnum'
+        payment_method:
+          $ref: '#/components/schemas/PaymentMethodEnum'
+        customer_notes:
+          type: string
+      required:
+      - payment_method
+      - shipping_address
+      - shipping_method
+    OrderItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        variant:
+          type: string
+          format: uuid
+        product_name:
+          type: string
+        product_image:
+          type: string
+          format: uri
+        size:
+          type: string
+        color:
+          type: string
+        quantity:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        total:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+      required:
+      - color
+      - id
+      - price
+      - product_image
+      - product_name
+      - quantity
+      - size
+      - total
+      - variant
+    OrderItemRequest:
+      type: object
+      properties:
+        variant:
+          type: string
+          format: uuid
+        product_name:
+          type: string
+          minLength: 1
+        product_image:
+          type: string
+          format: binary
+        size:
+          type: string
+          minLength: 1
+        color:
+          type: string
+          minLength: 1
+        quantity:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        total:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+      required:
+      - color
+      - price
+      - product_image
+      - product_name
+      - quantity
+      - size
+      - total
+      - variant
+    OrderRequest:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/Status0f0Enum'
+        email:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 254
+        phone:
+          type: string
+          minLength: 1
+          maxLength: 20
+        shipping_address:
+          type: string
+          format: uuid
+        billing_address:
+          type: string
+          format: uuid
+          nullable: true
+        shipping_method:
+          $ref: '#/components/schemas/ShippingMethodEnum'
+        shipping_cost:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        tracking_number:
+          type: string
+          nullable: true
+          maxLength: 100
+        customer_notes:
+          type: string
+      required:
+      - email
+      - phone
+      - shipping_address
+      - shipping_method
+    OrderStatus:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/Status0f0Enum'
+        notes:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        created_by:
+          type: string
+          readOnly: true
+      required:
+      - created_at
+      - created_by
+      - status
+    OrderStatusRequest:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/Status0f0Enum'
+        notes:
+          type: string
+      required:
+      - status
+    OrderTracking:
+      type: object
+      properties:
+        order_number:
+          type: string
+          maxLength: 50
+        current_status:
+          type: string
+        status_history:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderStatus'
+          readOnly: true
+        tracking_number:
+          type: string
+          nullable: true
+          maxLength: 100
+        shipping_method:
+          $ref: '#/components/schemas/ShippingMethodEnum'
+        shipping_address:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        paid_at:
+          type: string
+          format: date-time
+          nullable: true
+        shipped_at:
+          type: string
+          format: date-time
+          nullable: true
+        delivered_at:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - created_at
+      - current_status
+      - order_number
+      - shipping_address
+      - shipping_method
+      - status_history
+    PaginatedCartList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Cart'
+    PaginatedCategoryListList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategoryList'
+    PaginatedCategoryTreeList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategoryTree'
+    PaginatedColorList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Color'
+    PaginatedOrderList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Order'
+    PaginatedPaymentList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Payment'
+    PaginatedProductListList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductList'
+    PaginatedProductVariantList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductVariant'
+    PaginatedSizeList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Size'
+    PaginatedUserAddressList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserAddress'
+    PaginatedUserList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+    PasswordChangeRequest:
+      type: object
+      description: Serializer for password change
+      properties:
+        old_password:
+          type: string
+          minLength: 1
+        new_password:
+          type: string
+          minLength: 1
+        new_password2:
+          type: string
+          minLength: 1
+      required:
+      - new_password
+      - new_password2
+      - old_password
+    PasswordResetConfirmRequest:
+      type: object
+      description: Serializer for password reset confirmation
+      properties:
+        token:
+          type: string
+          minLength: 1
+        new_password:
+          type: string
+          minLength: 1
+      required:
+      - new_password
+      - token
+    PasswordResetRequestRequest:
+      type: object
+      description: Serializer for password reset request
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+      required:
+      - email
+    PatchedCategoryRequest:
+      type: object
+      description: Full category serializer with nested children
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+        slug:
+          type: string
+          minLength: 1
+          maxLength: 255
+          pattern: ^[-a-zA-Z0-9_]+$
+        description:
+          type: string
+        parent:
+          type: string
+          format: uuid
+          nullable: true
+          title: Parent category
+        image:
+          type: string
+          format: binary
+          nullable: true
+          title: Category image
+        icon:
+          type: string
+          description: Icon class name (e.g. "fa fa-home")
+          maxLength: 50
+        is_active:
+          type: boolean
+          title: Active
+        show_in_menu:
+          type: boolean
+        order:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        meta_title:
+          type: string
+          maxLength: 255
+        meta_description:
+          type: string
+        meta_keywords:
+          type: string
+          maxLength: 255
+    PatchedOrderRequest:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/Status0f0Enum'
+        email:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 254
+        phone:
+          type: string
+          minLength: 1
+          maxLength: 20
+        shipping_address:
+          type: string
+          format: uuid
+        billing_address:
+          type: string
+          format: uuid
+          nullable: true
+        shipping_method:
+          $ref: '#/components/schemas/ShippingMethodEnum'
+        shipping_cost:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        tracking_number:
+          type: string
+          nullable: true
+          maxLength: 100
+        customer_notes:
+          type: string
+    PatchedPaymentRequest:
+      type: object
+      properties:
+        order:
+          type: string
+          format: uuid
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        payment_method:
+          $ref: '#/components/schemas/PaymentMethodEnum'
+    PatchedProductDetailRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        slug:
+          type: string
+          minLength: 1
+          maxLength: 255
+          pattern: ^[-a-zA-Z0-9_]+$
+        description:
+          type: string
+          minLength: 1
+        category:
+          type: string
+          format: uuid
+        brand:
+          type: string
+          minLength: 1
+          maxLength: 100
+        gender:
+          $ref: '#/components/schemas/ProductDetailGenderEnum'
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        sale_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          nullable: true
+        material:
+          type: string
+          maxLength: 100
+        care_instructions:
+          type: string
+    PatchedUserAddressRequest:
+      type: object
+      properties:
+        address_type:
+          $ref: '#/components/schemas/AddressTypeEnum'
+        is_default:
+          type: boolean
+        full_name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        phone:
+          type: string
+          minLength: 1
+          pattern: ^\+?1?\d{9,15}$
+          maxLength: 17
+        country:
+          type: string
+          minLength: 1
+          maxLength: 100
+        city:
+          type: string
+          minLength: 1
+          maxLength: 100
+        street_address:
+          type: string
+          minLength: 1
+          maxLength: 255
+        apartment:
+          type: string
+          maxLength: 100
+        postal_code:
+          type: string
+          minLength: 1
+          maxLength: 20
+        state:
+          type: string
+          maxLength: 100
+        delivery_instructions:
+          type: string
+        is_active:
+          type: boolean
+    PatchedUserRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+          title: Email address
+          maxLength: 254
+        username:
+          type: string
+          minLength: 1
+          maxLength: 150
+        first_name:
+          type: string
+          minLength: 1
+          maxLength: 150
+        last_name:
+          type: string
+          minLength: 1
+          maxLength: 150
+        phone:
+          type: string
+          pattern: ^\+?1?\d{9,15}$
+          maxLength: 17
+        birth_date:
+          type: string
+          format: date
+          nullable: true
+        gender:
+          oneOf:
+          - $ref: '#/components/schemas/UserGenderEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        avatar:
+          type: string
+          format: binary
+          nullable: true
+        newsletter_subscription:
+          type: boolean
+        marketing_preferences:
+          description: User marketing preferences as JSON
+        language_preference:
+          type: string
+          minLength: 1
+          maxLength: 10
+        currency_preference:
+          type: string
+          minLength: 1
+          maxLength: 3
+    Payment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        order:
+          type: string
+          format: uuid
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        payment_method:
+          $ref: '#/components/schemas/PaymentMethodEnum'
+        status:
+          allOf:
+          - $ref: '#/components/schemas/PaymentStatusEnum'
+          readOnly: true
+        transaction_id:
+          type: string
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - amount
+      - created_at
+      - id
+      - order
+      - payment_method
+      - status
+      - transaction_id
+    PaymentMethodEnum:
+      enum:
+      - card
+      - bank
+      - cash
+      type: string
+      description: |-
+        * `card` - Credit/Debit Card
+        * `bank` - Bank Transfer
+        * `cash` - Cash on Delivery
+    PaymentRequest:
+      type: object
+      properties:
+        order:
+          type: string
+          format: uuid
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        payment_method:
+          $ref: '#/components/schemas/PaymentMethodEnum'
+      required:
+      - amount
+      - order
+      - payment_method
+    PaymentStatusEnum:
+      enum:
+      - pending
+      - paid
+      - failed
+      - refunded
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `paid` - Paid
+        * `failed` - Failed
+        * `refunded` - Refunded
+    ProductDetail:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        slug:
+          type: string
+          maxLength: 255
+          pattern: ^[-a-zA-Z0-9_]+$
+        description:
+          type: string
+        category:
+          type: string
+          format: uuid
+        category_name:
+          type: string
+          readOnly: true
+        brand:
+          type: string
+          maxLength: 100
+        gender:
+          $ref: '#/components/schemas/ProductDetailGenderEnum'
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        sale_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          nullable: true
+        discount_percent:
+          type: number
+          format: double
+          readOnly: true
+        material:
+          type: string
+          maxLength: 100
+        care_instructions:
+          type: string
+        main_image:
+          type: string
+          format: uri
+          readOnly: true
+        images:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductImage'
+          readOnly: true
+        variants:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductVariant'
+          readOnly: true
+        available_sizes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Size'
+          readOnly: true
+        available_colors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Color'
+          readOnly: true
+        related_products:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductList'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - available_colors
+      - available_sizes
+      - brand
+      - category
+      - category_name
+      - created_at
+      - description
+      - discount_percent
+      - gender
+      - id
+      - images
+      - main_image
+      - name
+      - price
+      - related_products
+      - slug
+      - variants
+    ProductDetailGenderEnum:
+      enum:
+      - M
+      - W
+      - U
+      type: string
+      description: |-
+        * `M` - Men
+        * `W` - Women
+        * `U` - Unisex
+    ProductDetailRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        slug:
+          type: string
+          minLength: 1
+          maxLength: 255
+          pattern: ^[-a-zA-Z0-9_]+$
+        description:
+          type: string
+          minLength: 1
+        category:
+          type: string
+          format: uuid
+        brand:
+          type: string
+          minLength: 1
+          maxLength: 100
+        gender:
+          $ref: '#/components/schemas/ProductDetailGenderEnum'
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        sale_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          nullable: true
+        material:
+          type: string
+          maxLength: 100
+        care_instructions:
+          type: string
+      required:
+      - brand
+      - category
+      - description
+      - gender
+      - name
+      - price
+      - slug
+    ProductImage:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        image:
+          type: string
+          format: uri
+        color:
+          type: integer
+          nullable: true
+        is_main:
+          type: boolean
+        order:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+      required:
+      - id
+      - image
+    ProductImageRequest:
+      type: object
+      properties:
+        image:
+          type: string
+          format: binary
+        color:
+          type: integer
+          nullable: true
+        is_main:
+          type: boolean
+        order:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+      required:
+      - image
+    ProductList:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        slug:
+          type: string
+          maxLength: 255
+          pattern: ^[-a-zA-Z0-9_]+$
+        category_name:
+          type: string
+          readOnly: true
+        brand:
+          type: string
+          maxLength: 100
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        sale_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          nullable: true
+        main_image:
+          type: string
+          format: uri
+          readOnly: true
+        discount_percent:
+          type: number
+          format: double
+          readOnly: true
+        available_sizes:
+          type: array
+          items:
+            type: string
+          readOnly: true
+        available_colors:
+          type: array
+          items:
+            type: string
+          readOnly: true
+      required:
+      - available_colors
+      - available_sizes
+      - brand
+      - category_name
+      - discount_percent
+      - id
+      - main_image
+      - name
+      - price
+      - slug
+    ProductVariant:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        size:
+          allOf:
+          - $ref: '#/components/schemas/Size'
+          readOnly: true
+        color:
+          allOf:
+          - $ref: '#/components/schemas/Color'
+          readOnly: true
+        sku:
+          type: string
+          maxLength: 100
+        stock:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        available:
+          type: boolean
+      required:
+      - available
+      - color
+      - id
+      - size
+      - sku
+    ProductVariantRequest:
+      type: object
+      properties:
+        sku:
+          type: string
+          minLength: 1
+          maxLength: 100
+        stock:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        available:
+          type: boolean
+      required:
+      - available
+      - sku
+    Register:
+      type: object
+      description: Serializer for user registration
+      properties:
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 254
+        username:
+          type: string
+          maxLength: 150
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        phone:
+          type: string
+          pattern: ^\+?1?\d{9,15}$
+          maxLength: 17
+        newsletter_subscription:
+          type: boolean
+        marketing_preferences:
+          type: object
+          additionalProperties: {}
+        language_preference:
+          type: string
+          maxLength: 10
+        currency_preference:
+          type: string
+          maxLength: 3
+      required:
+      - email
+      - first_name
+      - last_name
+      - username
+    RegisterRequest:
+      type: object
+      description: Serializer for user registration
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+          title: Email address
+          maxLength: 254
+        username:
+          type: string
+          minLength: 1
+          maxLength: 150
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+        password2:
+          type: string
+          writeOnly: true
+          minLength: 1
+        first_name:
+          type: string
+          minLength: 1
+          maxLength: 150
+        last_name:
+          type: string
+          minLength: 1
+          maxLength: 150
+        phone:
+          type: string
+          pattern: ^\+?1?\d{9,15}$
+          maxLength: 17
+        newsletter_subscription:
+          type: boolean
+        marketing_preferences:
+          type: object
+          additionalProperties: {}
+        terms_accepted:
+          type: boolean
+          writeOnly: true
+        language_preference:
+          type: string
+          minLength: 1
+          maxLength: 10
+        currency_preference:
+          type: string
+          minLength: 1
+          maxLength: 3
+      required:
+      - email
+      - first_name
+      - last_name
+      - password
+      - password2
+      - terms_accepted
+      - username
+    ShippingMethodEnum:
+      enum:
+      - standard
+      - express
+      - pickup
+      type: string
+      description: |-
+        * `standard` - Standard Delivery (2-4 days)
+        * `express` - Express Delivery (1-2 days)
+        * `pickup` - Pickup from Store
+    Size:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 10
+      required:
+      - id
+      - name
+    SizeRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 10
+      required:
+      - name
+    Status0f0Enum:
+      enum:
+      - awaiting_payment
+      - processing
+      - confirmed
+      - assembling
+      - shipped
+      - delivered
+      - cancelled
+      - returned
+      type: string
+      description: |-
+        * `awaiting_payment` - Awaiting Payment
+        * `processing` - Processing
+        * `confirmed` - Confirmed
+        * `assembling` - Assembling
+        * `shipped` - Shipped
+        * `delivered` - Delivered
+        * `cancelled` - Cancelled
+        * `returned` - Returned
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+      required:
+      - access
+      - refresh
+    TokenRefreshRequest:
+      type: object
+      properties:
+        refresh:
+          type: string
+          minLength: 1
+      required:
+      - refresh
+    TokenVerifyRequest:
+      type: object
+      properties:
+        token:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - token
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 254
+        username:
+          type: string
+          maxLength: 150
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        full_name:
+          type: string
+          readOnly: true
+        phone:
+          type: string
+          pattern: ^\+?1?\d{9,15}$
+          maxLength: 17
+        birth_date:
+          type: string
+          format: date
+          nullable: true
+        gender:
+          oneOf:
+          - $ref: '#/components/schemas/UserGenderEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        avatar:
+          type: string
+          format: uri
+          nullable: true
+        is_verified:
+          type: boolean
+          readOnly: true
+        email_verified:
+          type: boolean
+          readOnly: true
+        phone_verified:
+          type: boolean
+          readOnly: true
+        newsletter_subscription:
+          type: boolean
+        marketing_preferences:
+          description: User marketing preferences as JSON
+        language_preference:
+          type: string
+          maxLength: 10
+        currency_preference:
+          type: string
+          maxLength: 3
+        addresses:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserAddress'
+          readOnly: true
+        default_shipping_address:
+          allOf:
+          - $ref: '#/components/schemas/UserAddress'
+          readOnly: true
+        default_billing_address:
+          allOf:
+          - $ref: '#/components/schemas/UserAddress'
+          readOnly: true
+        has_valid_shipping_address:
+          type: boolean
+          readOnly: true
+        has_valid_billing_address:
+          type: boolean
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        last_login:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - addresses
+      - created_at
+      - default_billing_address
+      - default_shipping_address
+      - email
+      - email_verified
+      - first_name
+      - full_name
+      - has_valid_billing_address
+      - has_valid_shipping_address
+      - id
+      - is_verified
+      - last_login
+      - last_name
+      - phone_verified
+      - username
+    UserAddress:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        address_type:
+          $ref: '#/components/schemas/AddressTypeEnum'
+        is_default:
+          type: boolean
+        full_name:
+          type: string
+          maxLength: 255
+        phone:
+          type: string
+          pattern: ^\+?1?\d{9,15}$
+          maxLength: 17
+        country:
+          type: string
+          maxLength: 100
+        city:
+          type: string
+          maxLength: 100
+        street_address:
+          type: string
+          maxLength: 255
+        apartment:
+          type: string
+          maxLength: 100
+        postal_code:
+          type: string
+          maxLength: 20
+        state:
+          type: string
+          maxLength: 100
+        delivery_instructions:
+          type: string
+        formatted_address:
+          type: string
+          readOnly: true
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - city
+      - country
+      - created_at
+      - formatted_address
+      - full_name
+      - id
+      - phone
+      - postal_code
+      - street_address
+    UserAddressRequest:
+      type: object
+      properties:
+        address_type:
+          $ref: '#/components/schemas/AddressTypeEnum'
+        is_default:
+          type: boolean
+        full_name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        phone:
+          type: string
+          minLength: 1
+          pattern: ^\+?1?\d{9,15}$
+          maxLength: 17
+        country:
+          type: string
+          minLength: 1
+          maxLength: 100
+        city:
+          type: string
+          minLength: 1
+          maxLength: 100
+        street_address:
+          type: string
+          minLength: 1
+          maxLength: 255
+        apartment:
+          type: string
+          maxLength: 100
+        postal_code:
+          type: string
+          minLength: 1
+          maxLength: 20
+        state:
+          type: string
+          maxLength: 100
+        delivery_instructions:
+          type: string
+        is_active:
+          type: boolean
+      required:
+      - city
+      - country
+      - full_name
+      - phone
+      - postal_code
+      - street_address
+    UserGenderEnum:
+      enum:
+      - M
+      - F
+      - O
+      type: string
+      description: |-
+        * `M` - Male
+        * `F` - Female
+        * `O` - Other
+    UserRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+          title: Email address
+          maxLength: 254
+        username:
+          type: string
+          minLength: 1
+          maxLength: 150
+        first_name:
+          type: string
+          minLength: 1
+          maxLength: 150
+        last_name:
+          type: string
+          minLength: 1
+          maxLength: 150
+        phone:
+          type: string
+          pattern: ^\+?1?\d{9,15}$
+          maxLength: 17
+        birth_date:
+          type: string
+          format: date
+          nullable: true
+        gender:
+          oneOf:
+          - $ref: '#/components/schemas/UserGenderEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        avatar:
+          type: string
+          format: binary
+          nullable: true
+        newsletter_subscription:
+          type: boolean
+        marketing_preferences:
+          description: User marketing preferences as JSON
+        language_preference:
+          type: string
+          minLength: 1
+          maxLength: 10
+        currency_preference:
+          type: string
+          minLength: 1
+          maxLength: 3
+      required:
+      - email
+      - first_name
+      - last_name
+      - username
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

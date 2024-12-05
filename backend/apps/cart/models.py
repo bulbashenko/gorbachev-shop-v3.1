@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-from apps.products.models import Product, ProductVariant
+from apps.products.models import ProductVariant
 import uuid
 
 User = get_user_model()
@@ -30,27 +30,35 @@ class Cart(models.Model):
         ]
 
     def get_total_price(self):
-        return sum(item.get_cost() for item in self.items.all())
+        """Вычисляет общую стоимость всех товаров в корзине"""
+        total = sum(item.get_cost() for item in self.items.all())
+        return round(total, 2) if total else 0
     
     def get_total_quantity(self):
+        """Вычисляет общее количество товаров в корзине"""
         return sum(item.quantity for item in self.items.all())
 
     def transfer_to_user(self, user):
-        """Перенос корзины от гостя к пользователю"""
+        """Переносит корзину от гостя к пользователю"""
         if user.is_authenticated and self.session_id:
             try:
                 user_cart = Cart.objects.get(user=user)
                 # Переносим товары из гостевой корзины
                 for item in self.items.all():
-                    try:
-                        user_item = user_cart.items.get(variant=item.variant)
-                        user_item.quantity += item.quantity
-                        user_item.save()
-                    except CartItem.DoesNotExist:
+                    existing_item = user_cart.items.filter(variant=item.variant).first()
+                    if existing_item:
+                        # Если товар уже есть в корзине пользователя, обновляем количество
+                        existing_item.quantity += item.quantity
+                        if existing_item.quantity > item.variant.stock:
+                            existing_item.quantity = item.variant.stock
+                        existing_item.save()
+                    else:
+                        # Если товара нет, просто переносим его
                         item.cart = user_cart
                         item.save()
                 self.delete()
             except Cart.DoesNotExist:
+                # Если у пользователя нет корзины, просто привязываем гостевую корзину к нему
                 self.user = user
                 self.session_id = None
                 self.save()
@@ -74,12 +82,18 @@ class CartItem(models.Model):
         unique_together = ('cart', 'variant')
 
     def get_cost(self):
+        """Вычисляет стоимость данного товара в корзине"""
         return self.variant.product.current_price * self.quantity
 
     def is_available(self):
+        """Проверяет, доступен ли товар в запрошенном количестве"""
         return self.variant.stock >= self.quantity
 
     def save(self, *args, **kwargs):
+        """
+        Переопределяем сохранение, чтобы количество товара не превышало 
+        доступное на складе
+        """
         if self.quantity > self.variant.stock:
             self.quantity = self.variant.stock
         super().save(*args, **kwargs)

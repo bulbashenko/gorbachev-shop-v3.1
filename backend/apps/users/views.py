@@ -1,61 +1,74 @@
 from rest_framework import viewsets, status, generics
-from rest_framework.decorators import api_view, permission_classes, action
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
 from django.db import transaction
-from django.contrib.auth.password_validation import validate_password
-from django.core.exceptions import ValidationError
 from django.utils import timezone
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
 from datetime import timedelta
-from drf_spectacular.utils import extend_schema, OpenApiParameter
+import logging
+
 from .models import UserAddress
 from .serializers import (
     UserSerializer,
     RegisterSerializer,
     CustomTokenObtainPairSerializer,
     UserAddressSerializer,
-    PasswordChangeSerializer
+    PasswordChangeSerializer,
+    PasswordResetRequestSerializer,
+    PasswordResetConfirmSerializer
 )
 
+logger = logging.getLogger(__name__)
 User = get_user_model()
 
 @extend_schema(tags=['users'])
 class UserViewSet(viewsets.ModelViewSet):
+    """ViewSet for user management"""
     serializer_class = UserSerializer
-    
-    def get_permissions(self):
-        if self.action in ['create', 'me']:
-            permission_classes = [AllowAny]
-        else:
-            permission_classes = [IsAuthenticated]
-        return [permission() for permission in permission_classes]
     
     def get_queryset(self):
         if not self.request.user.is_staff:
             return User.objects.filter(id=self.request.user.id)
         return User.objects.all()
+    
+    def get_permissions(self):
+        if self.action in ['create', 'reset_password', 'verify_email']:
+            permission_classes = [AllowAny]
+        else:
+            permission_classes = [IsAuthenticated]
+        return [permission() for permission in permission_classes]
 
     @extend_schema(
-        summary="Get current user",
-        description="Returns data of the currently authenticated user",
+        summary="Get current user profile",
+        description="Returns the profile of the currently authenticated user",
         responses={200: UserSerializer}
     )
     @action(detail=False, methods=['get'])
     def me(self, request):
+        """Get current user profile"""
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
 
     @extend_schema(
-        summary="Update current user",
-        description="Updates the current user's information",
+        summary="Update current user profile",
+        description="Updates the current user's profile information",
         request=UserSerializer,
         responses={200: UserSerializer}
     )
     @action(detail=False, methods=['put', 'patch'])
     def update_me(self, request):
-        serializer = self.get_serializer(request.user, data=request.data, partial=True)
+        """Update current user profile"""
+        serializer = self.get_serializer(
+            request.user,
+            data=request.data,
+            partial=True
+        )
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
@@ -64,27 +77,173 @@ class UserViewSet(viewsets.ModelViewSet):
         summary="Change password",
         description="Changes the current user's password",
         request=PasswordChangeSerializer,
-        responses={200: None}
+        responses={
+            200: {"type": "object", "properties": {"message": {"type": "string"}}},
+            400: {"type": "object", "properties": {"error": {"type": "string"}}}
+        }
     )
     @action(detail=False, methods=['post'])
     def change_password(self, request):
+        """Change user password"""
         serializer = PasswordChangeSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         
         user = request.user
         if not user.check_password(serializer.validated_data['old_password']):
             return Response(
-                {'old_password': 'Wrong password'},
+                {'error': _('Wrong password')},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
         user.set_password(serializer.validated_data['new_password'])
         user.save()
-        return Response({'status': 'Password changed successfully'})
+        
+        # Invalidate all existing tokens
+        RefreshToken.for_user(user)
+        
+        return Response({'message': _('Password changed successfully')})
 
-@extend_schema(tags=['addresses'])
+    @extend_schema(
+        summary="Request password reset",
+        description="Sends a password reset email to the user",
+        request=PasswordResetRequestSerializer,
+        responses={200: {"type": "object", "properties": {"message": {"type": "string"}}}}
+    )
+    @action(detail=False, methods=['post'], permission_classes=[AllowAny])
+    def request_password_reset(self, request):
+        """Request password reset email"""
+        serializer = PasswordResetRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        try:
+            user = User.objects.get(
+                email=serializer.validated_data['email'],
+                is_active=True
+            )
+            user.send_password_reset_email()
+            return Response({'message': _('Password reset email sent')})
+        except User.DoesNotExist:
+            # Return same response for security
+            return Response({'message': _('Password reset email sent')})
+
+    @extend_schema(
+        summary="Reset password",
+        description="Resets user password using token",
+        request=PasswordResetConfirmSerializer,
+        responses={
+            200: {"type": "object", "properties": {"message": {"type": "string"}}},
+            400: {"type": "object", "properties": {"error": {"type": "string"}}}
+        }
+    )
+    @action(detail=False, methods=['post'], permission_classes=[AllowAny])
+    def reset_password(self, request):
+        """Reset password with token"""
+        serializer = PasswordResetConfirmSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        try:
+            user = User.objects.get(
+                password_reset_token=serializer.validated_data['token'],
+                is_active=True
+            )
+            
+            if not user.validate_reset_token(serializer.validated_data['token']):
+                return Response(
+                    {'error': _('Invalid or expired reset token')},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            user.set_password(serializer.validated_data['new_password'])
+            user.password_reset_token = ''
+            user.save()
+            
+            # Invalidate all existing tokens
+            RefreshToken.for_user(user)
+            
+            return Response({'message': _('Password reset successfully')})
+            
+        except User.DoesNotExist:
+            return Response(
+                {'error': _('Invalid reset token')},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+    @extend_schema(
+        summary="Verify email",
+        description="Verifies user email with token",
+        responses={
+            200: {"type": "object", "properties": {"message": {"type": "string"}}},
+            400: {"type": "object", "properties": {"error": {"type": "string"}}}
+        }
+    )
+    @action(detail=False, methods=['get'], permission_classes=[AllowAny])
+    def verify_email(self, request):
+        """Verify email with token"""
+        token = request.query_params.get('token')
+        
+        if not token:
+            return Response(
+                {'error': _('Token is required')},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            user = User.objects.get(
+                email_verification_token=token,
+                is_active=True
+            )
+            
+            if user.email_verified:
+                return Response({'message': _('Email already verified')})
+                
+            if not user.validate_verification_token(token):
+                return Response(
+                    {'error': _('Invalid or expired verification token')},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+                
+            user.verify_email()
+            return Response({'message': _('Email verified successfully')})
+            
+        except User.DoesNotExist:
+            return Response(
+                {'error': _('Invalid verification token')},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+    @extend_schema(
+        summary="Resend verification email",
+        description="Resends the verification email for the current user",
+        responses={
+            200: {"type": "object", "properties": {"message": {"type": "string"}}},
+            400: {"type": "object", "properties": {"error": {"type": "string"}}}
+        }
+    )
+    @action(detail=False, methods=['post'])
+    def resend_verification(self, request):
+        """Resend verification email"""
+        user = request.user
+        
+        if user.email_verified:
+            return Response(
+                {'error': _('Email already verified')},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        if user.email_verification_sent_at:
+            time_since_last_email = timezone.now() - user.email_verification_sent_at
+            if time_since_last_email < timedelta(minutes=5):
+                return Response(
+                    {'error': _('Please wait 5 minutes before requesting another verification email')},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        
+        user.send_verification_email()
+        return Response({'message': _('Verification email sent successfully')})
+
+@extend_schema(tags=['users'])
 class UserAddressViewSet(viewsets.ModelViewSet):
-    """ViewSet для управления адресами пользователя."""
+    """ViewSet for managing user addresses"""
     serializer_class = UserAddressSerializer
     permission_classes = [IsAuthenticated]
 
@@ -97,236 +256,89 @@ class UserAddressViewSet(viewsets.ModelViewSet):
     @extend_schema(
         summary="Set default address",
         description="Sets the selected address as default for shipping or billing",
-        parameters=[
-            OpenApiParameter(
-                name="type",
-                type=str,
-                description="Address type (shipping/billing)",
-                required=False,
-                default="shipping"
-            )
-        ],
-        responses={200: None}
+        responses={
+            200: {"type": "object", "properties": {"message": {"type": "string"}}},
+            400: {"type": "object", "properties": {"error": {"type": "string"}}}
+        }
     )
     @action(detail=True, methods=['post'])
     def set_default(self, request, pk=None):
+        """Set address as default"""
         address = self.get_object()
         address_type = request.data.get('type', 'shipping')
         
         if address_type not in ['shipping', 'billing']:
             return Response(
-                {'error': 'Invalid address type'},
+                {'error': _('Invalid address type')},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        if address_type == 'shipping':
-            request.user.default_shipping_address = address
-        else:
-            request.user.default_billing_address = address
-            
-        request.user.save()
-        return Response({'status': f'Default {address_type} address set successfully'})
+        address.is_default = True
+        address.address_type = address_type
+        address.save()
+        
+        return Response({
+            'message': _(f'Default {address_type} address set successfully')
+        })
 
 @extend_schema(tags=['auth'])
 class RegisterView(generics.CreateAPIView):
+    """View for user registration"""
     permission_classes = [AllowAny]
     serializer_class = RegisterSerializer
 
     @transaction.atomic
-    def post(self, request, *args, **kwargs):
+    def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
+        serializer.is_valid(raise_exception=True)
+        
+        try:
             user = serializer.save()
+            # Remove this line since the signal will handle sending the email
+            # user.send_verification_email()
+            
             return Response(
                 UserSerializer(user).data,
                 status=status.HTTP_201_CREATED
             )
-        return Response(
-            serializer.errors,
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        except Exception as e:
+            logger.error(f"Registration error: {str(e)}")
+            return Response(
+                {'error': _('Registration failed. Please try again.')},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
 @extend_schema(tags=['auth'])
 class CustomTokenObtainPairView(TokenObtainPairView):
-    permission_classes = [AllowAny]
+    """Enhanced JWT token view with additional security"""
     serializer_class = CustomTokenObtainPairSerializer
 
-    @extend_schema(
-        summary="Login to get tokens",
-        description="Exchange credentials for JWT tokens",
-        request=CustomTokenObtainPairSerializer,
-        responses={
-            200: {
-                "type": "object",
-                "properties": {
-                    "access": {"type": "string"},
-                    "refresh": {"type": "string"},
-                    "user": {"$ref": "#/components/schemas/User"}
-                }
-            },
-            401: {
-                "type": "object",
-                "properties": {
-                    "detail": {"type": "string"}
-                }
-            }
-        }
-    )
     def post(self, request, *args, **kwargs):
-        return super().post(request, *args, **kwargs)
+        # Check if account is locked
+        try:
+            user = User.objects.get(email=request.data.get('email'))
+            if user.is_account_locked():
+                return Response(
+                    {
+                        'error': _('Account is temporarily locked. Please try again later.'),
+                        'locked_until': user.account_locked_until
+                    },
+                    status=status.HTTP_403_FORBIDDEN
+                )
+        except User.DoesNotExist:
+            pass
 
-@extend_schema(
-    tags=['auth'],
-    summary="Verify email",
-    description="Verify user's email with token",
-    responses={
-        200: {"type": "object", "properties": {"message": {"type": "string"}}},
-        400: {"type": "object", "properties": {"error": {"type": "string"}}}
-    }
-)
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def verify_email(request):
-    token = request.GET.get('token')
-    
-    if not token:
-        return Response(
-            {'error': 'Token is required'},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    
-    try:
-        user = User.objects.get(
-            email_verification_token=token,
-            is_active=True
-        )
+        response = super().post(request, *args, **kwargs)
         
-        if user.email_verified:
-            return Response(
-                {'message': 'Email already verified'},
-                status=status.HTTP_200_OK
-            )
+        # Record failed login attempt if necessary
+        if response.status_code != status.HTTP_200_OK and 'email' in request.data:
+            try:
+                user = User.objects.get(email=request.data.get('email'))
+                user.record_login_attempt(
+                    success=False,
+                    ip_address=request.META.get('REMOTE_ADDR')
+                )
+            except User.DoesNotExist:
+                pass
             
-        if not user.validate_verification_token(token):
-            return Response(
-                {'error': 'Invalid or expired verification token'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-            
-        user.verify_email()
-        return Response({'message': 'Email verified successfully'})
-    except User.DoesNotExist:
-        return Response(
-            {'error': 'Invalid verification token'},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-
-@extend_schema(
-    tags=['auth'],
-    summary="Request password reset",
-    description="Request password reset email",
-    request={"type": "object", "properties": {"email": {"type": "string", "format": "email"}}},
-    responses={200: {"type": "object", "properties": {"message": {"type": "string"}}}}
-)
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def request_password_reset(request):
-    email = request.data.get('email')
-    
-    try:
-        user = User.objects.get(email=email, is_active=True)
-        user.send_password_reset_email()
-        
-        return Response({'message': 'Password reset email sent'})
-        
-    except User.DoesNotExist:
-        # Для безопасности возвращаем тот же ответ
-        return Response({'message': 'Password reset email sent'})
-
-@extend_schema(
-    tags=['auth'],
-    summary="Reset password",
-    description="Reset password using token",
-    request={
-        "type": "object",
-        "properties": {
-            "token": {"type": "string"},
-            "password": {"type": "string"},
-        },
-        "required": ["token", "password"]
-    },
-    responses={
-        200: {"type": "object", "properties": {"message": {"type": "string"}}},
-        400: {"type": "object", "properties": {"error": {"type": "string"}}}
-    }
-)
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def reset_password(request):
-    token = request.data.get('token')
-    new_password = request.data.get('password')
-    
-    try:
-        validate_password(new_password)
-    except ValidationError as e:
-        return Response(
-            {'error': e.messages},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    
-    try:
-        user = User.objects.get(
-            password_reset_token=token,
-            is_active=True
-        )
-        
-        if not user.validate_reset_token(token):
-            return Response(
-                {'error': 'Invalid or expired reset token'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        user.set_password(new_password)
-        user.password_reset_token = ''
-        user.save()
-        
-        return Response({'message': 'Password reset successfully'})
-        
-    except User.DoesNotExist:
-        return Response(
-            {'error': 'Invalid reset token'},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    
-@extend_schema(
-    tags=['auth'],
-    summary="Resend verification email",
-    description="Resends the verification email for the current user",
-    responses={
-        200: {"type": "object", "properties": {"message": {"type": "string"}}},
-        400: {"type": "object", "properties": {"error": {"type": "string"}}}
-    }
-)
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def resend_verification_email(request):
-    user = request.user
-    
-    # Проверяем, не верифицирован ли уже email
-    if user.email_verified:
-        return Response(
-            {'error': 'Email already verified'},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    
-    # Проверяем, не отправляли ли мы письмо недавно
-    if user.email_verification_sent_at:
-        time_since_last_email = timezone.now() - user.email_verification_sent_at
-        if time_since_last_email < timedelta(minutes=5):  # Ограничение в 5 минут
-            return Response(
-                {'error': 'Please wait 5 minutes before requesting another verification email'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-    
-    user.send_verification_email()
-    return Response({'message': 'Verification email sent successfully'})
+        return response
