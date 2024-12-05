@@ -22,7 +22,6 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   const nextCookies = await cookies();
   const localeFromCookie = nextCookies.get('NEXT_LOCALE')?.value || 'en';
 
-  // Асинхронный импорт сообщений для начальной локали
   let messages;
   try {
     messages = (await import(`../messages/${localeFromCookie}.json`)).default;
@@ -31,8 +30,12 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
     messages = (await import(`../messages/en.json`)).default;
   }
 
+  // Определяем класс шрифта для локали
+  const fontClassName =
+    localeFromCookie === 'ru' ? pt_sans.className : dm_sans.className;
+
   return (
-    <html lang={localeFromCookie}>
+    <html lang={localeFromCookie} className={fontClassName}>
       <body>
         <ThemeProvider
           attribute="class"
@@ -58,3 +61,4 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
     </html>
   );
 }
+
