@@ -26,10 +26,10 @@ interface FontProviderProps {
 const FontProvider: React.FC<FontProviderProps> = ({ children, fonts }) => {
   const locale = useSelector((state: RootState) => state.language.locale);
 
-  const currentFontClass = fonts[locale] || fonts.default;
-
   useEffect(() => {
     const root = document.documentElement;
+
+    const currentFontClass = fonts[locale] || fonts.default;
 
     // Удаляем все классы шрифтов
     Object.values(fonts).forEach(fontClass => root.classList.remove(fontClass));
@@ -37,6 +37,8 @@ const FontProvider: React.FC<FontProviderProps> = ({ children, fonts }) => {
     // Добавляем класс для текущей локали
     root.classList.add(currentFontClass);
   }, [locale, fonts]);
+
+  const currentFontClass = fonts[locale] || fonts.default;
 
   return (
     <FontContext.Provider value={{ currentFontClass }}>
