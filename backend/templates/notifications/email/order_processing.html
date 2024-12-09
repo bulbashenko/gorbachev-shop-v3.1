@@ -1,9 +1,0 @@
-# templates/notifications/email/order_processing.html
-{% extends "notifications/email/base.html" %}
-{% block title %}Order Processing - {{ order.order_number }}{% endblock %}
-{% block content %}
-<h2>Your Order is Being Processed!</h2>
-<p>Hi {{ user.first_name }},</p>
-<p>Great news! Your payment has been confirmed and your order is now being processed.</p>
-{% include "notifications/email/includes/order_details.html" %}
-{% endblock %}

@@ -1,8 +1,0 @@
-{% extends "notifications/email/base.html" %}
-{% block title %}Order Confirmed - {{ order.order_number }}{% endblock %}
-{% block content %}
-<h2>Order Confirmed!</h2>
-<p>Hi {{ user.first_name }},</p>
-<p>Your order has been confirmed and will be prepared for shipping soon.</p>
-{% include "notifications/email/includes/order_details.html" %}
-{% endblock %}
