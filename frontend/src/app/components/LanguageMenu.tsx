@@ -10,6 +10,7 @@ const languages = [
   { code: 'en', label: 'EN' },
   { code: 'ru', label: 'RU' },
   { code: 'sk', label: 'SK' },
+  { code: 'hu', label: 'HU'}
 ];
 
 const LanguageMenu: React.FC = () => {

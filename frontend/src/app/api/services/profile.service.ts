@@ -96,28 +96,27 @@ export const profileService = {
     if (!token) {
       throw new Error('Not authenticated');
     }
-
+  
     const response = await fetch(`${API_URL}/users/users/change_password/`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        current_password: data.old_password,
-        new_password: data.new_password,
-      }),
+      body: JSON.stringify(data), // Убедитесь, что данные отправляются корректно
       credentials: 'include',
     });
-
+  
     if (!response.ok) {
+      const errorDetails = await response.json().catch(() => null);
+      console.error('Server error:', errorDetails);
       if (response.status === 401) {
         authService.logout();
         throw new Error('Session expired');
       }
       throw new Error('Failed to change password');
     }
-  },
+  }, 
 
   async updateAddress(id: string, data: AddressData) {
     const token = authService.getToken();

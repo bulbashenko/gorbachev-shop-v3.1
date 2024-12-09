@@ -5,19 +5,19 @@
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import navigationLinks from '../utils/navigationLinks';
-import {
-  FiUser,
-  FiHeart,
-  FiShoppingCart,
-  FiSearch,
-} from 'react-icons/fi';
+import { FiUser, FiHeart, FiShoppingCart, FiSearch } from 'react-icons/fi';
 import LanguageMenu from './LanguageMenu';
 import CurrencyMenu from './CurrencyMenu';
 import ThemeSwitcher from './ThemeSwitcher';
 import { dm_sans } from '../utils/fontConfig';
+import { useAuth } from '@/contexts/AuthContext'; // Предполагается, что у вас есть такой хук
+
 export default function Header() {
   const t = useTranslations();
   const totalQuantity = 0;
+
+  // Получаем информацию о том, аутентифицирован ли пользователь
+  const { isAuthenticated } = useAuth();
 
   return (
     <header className="">
@@ -56,12 +56,15 @@ export default function Header() {
             </Link>
           </nav>
 
-          {/* Блок 3: Иконки аккаунт, поиск и т.д. */}
+          {/* Блок 3: Иконки: аккаунт, поиск, избранное, корзина */}
           <div className="flex items-center space-x-4">
             <Link href="/search" className="relative">
               <FiSearch className="w-6 h-6" />
             </Link>
-            <Link href="/auth" className="relative">
+            {/* Проверяем состояние аутентификации:
+                Если isAuthenticated = true, ссылаемся на /profile,
+                иначе – на /auth */}
+            <Link href={isAuthenticated ? "/profile" : "/auth"} className="relative">
               <FiUser className="w-6 h-6" />
             </Link>
             <Link href="/favorites" className="relative">

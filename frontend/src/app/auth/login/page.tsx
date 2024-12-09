@@ -7,7 +7,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { dm_mono, pt_mono } from '../../utils/fontConfig';
 import { useAuth } from '@/contexts/AuthContext';
 
-export default function AuthPage() {
+export default function LoginPage() {
   const t = useTranslations();
   const locale = useLocale();
   const { login } = useAuth();
@@ -81,7 +81,7 @@ export default function AuthPage() {
           <div className="col-span-1 md:col-span-4 flex flex-col items-center md:items-start text-center md:text-left">
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">{t('auth.newCustomers')}</h2>
             <p className="text-base md:text-lg lg:text-xl mb-8">{t('auth.newCustomersDescription')}</p>
-            <Link href="/register">
+            <Link href="/auth/register">
               <Button>{t('auth.register')}</Button>
             </Link>
           </div>

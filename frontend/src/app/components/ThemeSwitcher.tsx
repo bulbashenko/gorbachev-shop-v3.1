@@ -1,19 +1,18 @@
-// src/components/ThemeSwitcher.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
 import { FiSun, FiMoon } from 'react-icons/fi';
 
 const ThemeSwitcher: React.FC = () => {
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
-
-  // Инициализация темы из localStorage или по умолчанию 'light'
-  useEffect(() => {
+  // Инициализация темы из localStorage, если есть
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     const storedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
-    const preferredTheme = storedTheme || 'light';
-    setTheme(preferredTheme);
-    applyTheme(preferredTheme);
-  }, []);
+    return storedTheme || 'light';
+  });
+
+  useEffect(() => {
+    applyTheme(theme);
+  }, [theme]);
 
   const applyTheme = (newTheme: 'light' | 'dark') => {
     if (newTheme === 'dark') {
@@ -28,7 +27,6 @@ const ThemeSwitcher: React.FC = () => {
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
-    applyTheme(newTheme);
     localStorage.setItem('theme', newTheme);
   };
 

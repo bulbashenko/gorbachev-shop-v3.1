@@ -73,6 +73,7 @@ export const authService = {
 
     if (!response.ok) {
       const errorData = await response.json();
+      console.error('Server error response:', errorData);
       throw new Error(errorData.detail || 'Registration failed');
     }
 

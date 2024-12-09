@@ -3,7 +3,7 @@
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { authService } from '@/app/api/services/auth.service';
+import { authService, type RegisterData } from '@/app/api/services/auth.service';
 
 interface User {
     id: string;
@@ -21,6 +21,7 @@ interface AuthContextType {
     login: (email: string, password: string) => Promise<void>;
     logout: () => void;
     checkAuth: () => Promise<void>;
+    register: (data: RegisterData) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -87,16 +88,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 return false;
             };
 
-            // Первая попытка с текущим токеном
             let success = await tryRequest(currentToken);
 
-            // Если не удалось, пробуем обновить токен
             if (!success) {
                 try {
                     const newToken = await refreshToken();
                     success = await tryRequest(newToken);
                 } catch {
-                    // Если не удалось обновить токен, очищаем авторизацию
                     authService.logout();
                     setUser(null);
                 }
@@ -138,6 +136,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(null);
         router.push('/auth/login');
     };
+    
+    // Новый метод для регистрации
+    const register = async (data: RegisterData) => {
+        setIsLoading(true);
+        try {
+            await authService.register(data);
+            // Можно либо сразу логинить нового пользователя:
+            // await login(data.email, data.password);
+            // Или просто перенаправить на страницу логина, например:
+            router.push('/auth/login?registered=true');
+        } catch (error) {
+            console.error('Registration failed:', error);
+            throw error;
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     return (
         <AuthContext.Provider
@@ -148,6 +163,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 login,
                 logout,
                 checkAuth,
+                register,
             }}
         >
             {children}

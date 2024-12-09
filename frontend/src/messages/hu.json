@@ -1,0 +1,40 @@
+{
+    "hello": "Helló",
+    "welcome": "Üdvözöljük az üzletünkben!",
+    "theme": "Sötét téma",
+    "logoAlt": "Logó",
+    "nav": {
+      "home": "Kezdőlap",
+      "about": "Rólunk",
+      "contact": "Kapcsolat"
+    },
+    "buttons": {
+      "login": "Bejelentkezés"
+    },
+    "navigation": {
+      "allProducts": "Minden termék",
+      "mobAllProducts": "MINDEN",
+      "sweaters": "Pulóverek",
+      "mobSweaters": "PULÓVEREK",
+      "pants": "Nadrágok",
+      "mobPants": "NADRÁGOK",
+      "bags": "Táskák",
+      "mobBags": "TÁSKÁK",
+      "tshirts": "Pólók",
+      "mobTshirts": "PÓLÓK",
+      "accessories": "Kiegészítők",
+      "mobAccessories": "EXTRA",
+      "information": "Rólunk"
+    },
+    "auth": {
+      "logIn": "BEJELENTKEZÉS",
+      "email": "Email",
+      "password": "Jelszó",
+      "forgotPassword": "Elfelejtette a jelszavát?",
+      "signIn": "Belépés",
+      "newCustomers": "ÚJ VÁSÁRLÓK",
+      "newCustomersDescription": "Iratkozzon fel korai akcióhozzáférésre, személyre szabott új érkezésekre, trendekre és promóciókra. Ha nem szeretne további e-maileket kapni, kattintson az e-mailjeinkben található leiratkozás gombra.",
+      "register": "Regisztráció"
+    }
+  }
+  
