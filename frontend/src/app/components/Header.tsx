@@ -1,5 +1,3 @@
-// src/components/Header.tsx
-
 'use client';
 
 import { useTranslations } from 'next-intl';
@@ -10,14 +8,10 @@ import LanguageMenu from './LanguageMenu';
 import CurrencyMenu from './CurrencyMenu';
 import ThemeSwitcher from './ThemeSwitcher';
 import { dm_sans } from '../utils/fontConfig';
-import { useAuth } from '@/contexts/AuthContext'; // Предполагается, что у вас есть такой хук
 
 export default function Header() {
   const t = useTranslations();
   const totalQuantity = 0;
-
-  // Получаем информацию о том, аутентифицирован ли пользователь
-  const { isAuthenticated } = useAuth();
 
   return (
     <header className="">
@@ -61,10 +55,7 @@ export default function Header() {
             <Link href="/search" className="relative">
               <FiSearch className="w-6 h-6" />
             </Link>
-            {/* Проверяем состояние аутентификации:
-                Если isAuthenticated = true, ссылаемся на /profile,
-                иначе – на /auth */}
-            <Link href={isAuthenticated ? "/profile" : "/auth"} className="relative">
+            <Link href="/auth" className="relative">
               <FiUser className="w-6 h-6" />
             </Link>
             <Link href="/favorites" className="relative">
