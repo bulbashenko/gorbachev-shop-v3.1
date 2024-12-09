@@ -22,6 +22,14 @@ jobs:
           node-version: "20"
           cache: "npm"
 
+      - name: Verify lock file
+        working-directory: ./frontend
+        run: |
+          if [ ! -f package-lock.json ]; then
+            echo "Error: package-lock.json is missing in the ./frontend directory."
+            exit 1
+          fi
+
       - name: Install dependencies
         working-directory: ./frontend
         run: npm ci
