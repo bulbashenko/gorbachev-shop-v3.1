@@ -1,11 +1,6 @@
 pipeline {
     agent any
     stages {
-        stage('Checkout') {
-            steps {
-                git branch: 'main', credentialsId: 'your-credentials-id', url: 'https://github.com/username/repository.git'
-            }
-        }
         stage('Frontend Build & Test') {
             steps {
                 dir('frontend') {
