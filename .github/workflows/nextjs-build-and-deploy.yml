@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  # Сборка проекта
+  # Сборка и проверка проекта
   build:
     runs-on: ubuntu-latest
     steps:
@@ -23,9 +23,15 @@ jobs:
           cache: "npm"
 
       - name: Install dependencies
+        working-directory: ./frontend
         run: npm ci
 
+      - name: Lint code with ESLint
+        working-directory: ./frontend
+        run: npm run lint
+
       - name: Build with Next.js
+        working-directory: ./frontend
         run: npm run build
 
   # Деплой в dev
