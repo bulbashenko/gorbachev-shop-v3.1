@@ -23,7 +23,7 @@ jobs:
           cache: "npm"
 
       - name: Verify lock file
-        working-directory: ./frontend
+        working-directory: ./gorbachev-shop-v3.1/frontend
         run: |
           if [ ! -f package-lock.json ]; then
             echo "Error: package-lock.json is missing in the ./frontend directory."
@@ -31,15 +31,15 @@ jobs:
           fi
 
       - name: Install dependencies
-        working-directory: ./frontend
+        working-directory: ./gorbachev-shop-v3.1/frontend
         run: npm ci
 
       - name: Lint code with ESLint
-        working-directory: ./frontend
+        working-directory: ./gorbachev-shop-v3.1/frontend
         run: npm run lint
 
       - name: Build with Next.js
-        working-directory: ./frontend
+        working-directory: ./gorbachev-shop-v3.1/frontend
         run: npm run build
 
   # Деплой в dev
