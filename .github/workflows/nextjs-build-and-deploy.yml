@@ -1,0 +1,49 @@
+name: Build and Deploy Next.js to Dev
+
+on:
+  push:
+    branches: ["new_frontend_dev"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  # Сборка проекта
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build with Next.js
+        run: npm run build
+
+  # Деплой в dev
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Configure Git
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+
+      - name: Merge to Dev
+        run: |
+          git fetch origin
+          git checkout dev
+          git merge --no-ff new_frontend_dev || exit 1
+          git push origin dev
